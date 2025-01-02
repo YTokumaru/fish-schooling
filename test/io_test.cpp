@@ -28,7 +28,7 @@ protected:
   {
     // Create a valid YAML::Node structure
     validConfig = YAML::Load(R"(
-            sim-params:
+            simulation-params:
               length: 64
               n-fish: 1000
               max-steps: 1000
@@ -85,7 +85,7 @@ TEST_F(ConfigLoaderTest, MissingSimParamsKey)
 TEST_F(ConfigLoaderTest, MissingFishParamsKey)
 {
   YAML::Node incompleteConfig = YAML::Load(R"(
-        sim-params:
+        simulation-params:
           length: 64
           n-fish: 1000
     )");
@@ -96,7 +96,7 @@ TEST_F(ConfigLoaderTest, MissingFishParamsKey)
 TEST_F(ConfigLoaderTest, WrongType)
 {
   YAML::Node wrongTypeConfig = YAML::Load(R"(
-        sim-params: 1000
+        simulation-params: 1000
         fish-params: 1000
     )");
 
@@ -107,7 +107,7 @@ TEST_F(ConfigLoaderTest, WrongType)
 TEST_F(ConfigLoaderTest, WrongDataType)
 {
   YAML::Node wrongDataTypeConfig = YAML::Load(R"(
-        sim-params:
+        simulation-params:
           length: 
           n-fish: "1000"
           max-steps: "1000"
@@ -131,7 +131,7 @@ TEST_F(ConfigLoaderTest, WrongDataType)
 TEST_F(ConfigLoaderTest, NegativeValues)
 {
   YAML::Node negativeValuesConfig = YAML::Load(R"(
-        sim-params:
+        simulation-params:
           length: -64
           n-fish: -1000
           max-steps: -1000

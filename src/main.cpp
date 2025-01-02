@@ -28,6 +28,8 @@ int main()
     return 1;
   }
 
+  // Output file
+  std::ofstream output_file("output.txt");
 
   // Initialize fish with random positions and velocities
   std::random_device rand;
@@ -35,8 +37,11 @@ int main()
   std::uniform_real_distribution<double> dis_pos(0.0, sim_param.length);
   std::uniform_real_distribution<double> dis_vel(-fish_param.vel_standard, fish_param.vel_standard);
 
-  std::vector<Fish> fish(sim_param.n_fish,
-    Fish{ dis_pos(gen), dis_pos(gen), dis_pos(gen), dis_vel(gen), dis_vel(gen), dis_vel(gen), 0, 0, 0, 0 });
+  std::vector<Fish> fish(sim_param.n_fish, Fish{});
+  for (auto &one_fish : fish) {
+    one_fish.setPosition({ dis_pos(gen), dis_pos(gen), dis_pos(gen) });
+    one_fish.setVelocity({ dis_vel(gen), dis_vel(gen), dis_vel(gen) });
+  }
 
   // Pre-generate the relative positions of the neighboring cells
   auto repulsion_boundary = getBoundaryCells(fish_param.repulsion_radius);
@@ -46,7 +51,10 @@ int main()
   auto attractive_inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
 
   // Main loop
-  for (int time_step = 0; time_step < sim_param.max_steps; time_step++) {
+  for (unsigned int time_step = 0; time_step < sim_param.max_steps; time_step++) {
+
+    std::cout << "Time step: " << time_step << std::endl;
+
     // Sort the fish into 1x1x1 grid cells
     std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
       std::vector<std::vector<std::vector<Fish *>>>(
@@ -80,7 +88,14 @@ int main()
 
     // Update the fish positions and velocities
     for (auto &one_fish : fish) { one_fish.update(sim_param, fish_param); }
+
+    // Output the fish positions
+    for (auto &one_fish : fish) {
+      auto [x, y, z] = one_fish.getPosition();
+      output_file << x << " " << y << " " << z << '\n';
+    }
   }
 
+  output_file.close();
   return EXIT_SUCCESS;
 }

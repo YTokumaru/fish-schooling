@@ -32,6 +32,7 @@ public:
   void update(SimParam sim_param, FishParam fish_param);
   void setLambda(double lambda);
   void setPosition(double x, double y, double z);
+  void setPosition(Vect3 position);
   void setVelocity(double vx, double vy, double vz);
   void setVelocity(Vect3 velocity);
   void setDeltaVelocity(double delta_vx, double delta_vy, double delta_vz);

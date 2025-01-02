@@ -30,6 +30,11 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
     unsigned long loop_x = center_x + boundary_cell_relpos[0];
     unsigned long loop_y = center_y + boundary_cell_relpos[1];
     unsigned long loop_z = center_z + boundary_cell_relpos[2];
+    // Account for the periodic boundary conditions
+    loop_x = (loop_x + cells.size()) % cells.size();
+    loop_y = (loop_y + cells[0].size()) % cells[0].size();
+    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+
     neighbour_count += cells[loop_x][loop_y][loop_z].size();
 
     // Loop through the fish in the neighboring cell
@@ -54,6 +59,12 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
     unsigned long loop_x = center_x + inner_cell_relpos[0];
     unsigned long loop_y = center_y + inner_cell_relpos[1];
     unsigned long loop_z = center_z + inner_cell_relpos[2];
+
+    // Account for the periodic boundary conditions
+    loop_x = (loop_x + cells.size()) % cells.size();
+    loop_y = (loop_y + cells[0].size()) % cells[0].size();
+    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+
     neighbour_count += cells[loop_x][loop_y][loop_z].size();
 
     // Loop through the fish in the neighboring cell
@@ -91,6 +102,12 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     unsigned long loop_x = center_x + boundary_cell_relpos[0];
     unsigned long loop_y = center_y + boundary_cell_relpos[1];
     unsigned long loop_z = center_z + boundary_cell_relpos[2];
+
+    // Account for the periodic boundary conditions
+    loop_x = (loop_x + cells.size()) % cells.size();
+    loop_y = (loop_y + cells[0].size()) % cells[0].size();
+    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+
     neighbour_count += cells[loop_x][loop_y][loop_z].size();
 
     // Loop through the fish in the neighboring cell
@@ -114,6 +131,12 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     unsigned long loop_x = center_x + inner_cell_relpos[0];
     unsigned long loop_y = center_y + inner_cell_relpos[1];
     unsigned long loop_z = center_z + inner_cell_relpos[2];
+
+    // Account for the periodic boundary conditions
+    loop_x = (loop_x + cells.size()) % cells.size();
+    loop_y = (loop_y + cells[0].size()) % cells[0].size();
+    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+
     neighbour_count += cells[loop_x][loop_y][loop_z].size();
 
     // Loop through the fish in the neighboring cell

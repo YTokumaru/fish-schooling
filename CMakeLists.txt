@@ -25,3 +25,6 @@ include(ProjectOptions.cmake)
 project_setup_options()
 
 add_subdirectory(src)
+
+# Copy the config.yaml file to the build directory
+file(COPY ${CMAKE_SOURCE_DIR}/config.yaml DESTINATION ${CMAKE_BINARY_DIR}/src)

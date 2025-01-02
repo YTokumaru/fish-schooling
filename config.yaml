@@ -4,10 +4,9 @@ simulation-params:
   n-fish: 1000
   max-steps: 1000
   delta-t: 0.01
-
 fish-params:
   vel-standard: 1.5
-  vel-repultion: 1.5
+  vel-repulsion: 1.5
   vel-escape: 7.5
   body-length: 1.0
   repulsion-radius: 1.0

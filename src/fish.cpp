@@ -47,6 +47,8 @@ double Fish::speed() const { return abs(velocity); }
 
 void Fish::setPosition(double x, double y, double z) { position = { x, y, z }; }
 
+void Fish::setPosition(Vect3 position) { this->position = position; }
+
 void Fish::setLambda(double lambda) { this->lambda = lambda; }
 
 void Fish::setVelocity(double vx, double vy, double vz) { velocity = { vx, vy, vz }; }

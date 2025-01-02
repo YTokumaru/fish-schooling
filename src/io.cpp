@@ -4,7 +4,7 @@
 int operator>>(const YAML::Node &node, SimParam &param)
 {
   try {
-    YAML::Node sim_params = node["sim-params"];
+    YAML::Node sim_params = node["simulation-params"];
     param.length = sim_params["length"].as<unsigned int>();
     param.n_fish = sim_params["n-fish"].as<unsigned int>();
     param.max_steps = sim_params["max-steps"].as<unsigned int>();
@@ -35,14 +35,4 @@ int operator>>(const YAML::Node &node, FishParam &param)
   }
 
   return EXIT_SUCCESS;
-}
-
-std::tuple<SimParam, FishParam> loadConfig(std::string filename)
-{
-  YAML::Node config = YAML::LoadFile(filename);
-  SimParam sim_param;
-  FishParam fish_param;
-  config >> sim_param;
-  config >> fish_param;
-  return std::make_tuple(sim_param, fish_param);
 }
