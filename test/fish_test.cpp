@@ -64,24 +64,22 @@ TEST(FishTest, Speed)
   ASSERT_DOUBLE_EQ(fish.speed(), 5.0);
 }
 
-TEST(FishTest, UpdatePosition)
+TEST(FishTest, Update)
 {
-  Fish fish({ 0, 0, 0 }, { 1, 1, 1 }, { 0, 0, 0 }, 0);
-  fish.update(1.0, 100, 0.0);
-  ASSERT_DOUBLE_EQ(fish.getPosition().x, 1.0);
-  ASSERT_DOUBLE_EQ(fish.getPosition().y, 1.0);
-  ASSERT_DOUBLE_EQ(fish.getPosition().z, 1.0);
-}
-
-TEST(FishTest, UpdateWithParams)
-{
-  Fish fish({ 0, 0, 0 }, { 1, 1, 1 }, { 0.1, 0.1, 0.1 }, 0.5);
+  Fish fish({ 0, 0, 0 }, { 1, 1, 1 }, { 0.1, 0.1, 0.1 }, 15.0);
   SimParam sim_param{ 100, 1000, 1000, 0.01 };
-  FishParam fish_param{ 1.5, 1.5, 7.5, 1.0, 1.0, 7.5, 3, 15.0, 0.1 };
+  FishParam fish_param{ 1.5, 1.5, 7.5, 1.0, 1.0, 7.5, 3, 15.0, 1.0 };
   fish.update(sim_param, fish_param);
+  ASSERT_NEAR(fish.getPosition().x, 0.011, 1e-6);
+  ASSERT_NEAR(fish.getPosition().y, 0.011, 1e-6);
+  ASSERT_NEAR(fish.getPosition().z, 0.011, 1e-6);
   ASSERT_DOUBLE_EQ(fish.getVelocity().x, 1.1);
   ASSERT_DOUBLE_EQ(fish.getVelocity().y, 1.1);
   ASSERT_DOUBLE_EQ(fish.getVelocity().z, 1.1);
+  ASSERT_DOUBLE_EQ(fish.getDeltaVelocity().x, 0.0);
+  ASSERT_DOUBLE_EQ(fish.getDeltaVelocity().y, 0.0);
+  ASSERT_DOUBLE_EQ(fish.getDeltaVelocity().z, 0.0);
+  ASSERT_DOUBLE_EQ(fish.getLambda(), 15.0 - (15.0 / 100));
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
