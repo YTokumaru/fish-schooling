@@ -1,12 +1,29 @@
 add_executable(fish_school main.cpp)
 target_link_libraries(fish_school PRIVATE project_warnings)
-target_link_libraries(fish_school PRIVATE fish coordinate eom)
+target_link_libraries(fish_school PRIVATE fish coordinate simulation io eom)
+target_link_libraries(fish_school PUBLIC yaml-cpp::yaml-cpp)
 
 add_library(coordinate coordinate.cpp)
+target_link_libraries(coordinate PRIVATE project_warnings)
 target_include_directories(coordinate PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
+add_library(simulation simulation.cpp)
+target_link_libraries(simulation PRIVATE project_warnings)
+target_include_directories(simulation PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_link_libraries(simulation PRIVATE coordinate)
+
 add_library(fish fish.cpp)
+target_link_libraries(fish PRIVATE project_warnings)
+target_link_libraries(fish PUBLIC simulation)
 target_include_directories(fish PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
 add_library(eom eom.cpp)
+target_link_libraries(eom PRIVATE project_warnings)
+target_link_libraries(eom PRIVATE fish simulation)
 target_include_directories(eom PUBLIC "${PROJECT_SOURCE_DIR}/include")
+
+add_library(io io.cpp)
+target_link_libraries(io PRIVATE project_warnings)
+target_include_directories(io PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_link_libraries(io PUBLIC yaml-cpp::yaml-cpp)
+target_link_libraries(io PRIVATE simulation)

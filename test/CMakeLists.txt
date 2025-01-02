@@ -26,8 +26,38 @@ target_link_libraries(
     GTest::gmock_main
 )
 
+add_executable(
+    fish_test
+    fish_test.cpp
+)
+target_link_libraries(
+    fish_test
+    fish
+)
+target_link_libraries(
+    fish_test
+    GTest::gtest_main
+    GTest::gmock_main
+)
+
+add_executable(
+    io_test
+    io_test.cpp
+)
+target_link_libraries(
+    io_test
+    io
+)
+target_link_libraries(
+    io_test
+    GTest::gtest_main
+    GTest::gmock_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(boundary_test)
 gtest_discover_tests(inner_test)
+gtest_discover_tests(fish_test)
+gtest_discover_tests(io_test)
 
 enable_testing()

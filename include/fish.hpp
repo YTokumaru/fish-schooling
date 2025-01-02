@@ -1,40 +1,46 @@
 #ifndef FISH_HPP
 #define FISH_HPP
 
+#include "coordinate.hpp"
+#include "simulation.hpp"
+#include <array>
 #include <cmath>
+
 class Fish
 {
 private:
-  double x;
-  double y;
-  double z;
-  double vx;
-  double vy;
-  double vz;
+  Vect3 position;
+  Vect3 velocity;
+  Vect3 delta_velocity;
   double lambda;
 
-  double delta_vx;
-  double delta_vy;
-  double delta_vz;
 public:
   Fish();
+  Fish(Vect3 position, Vect3 velocity, Vect3 delta_velocity, double lambda);
+  Fish(double x,
+    double y,
+    double z,
+    double vx,
+    double vy,
+    double vz,
+    double delta_vx,
+    double delta_vy,
+    double delta_vz,
+    double lambda);
   ~Fish();
-  void update(double dt, int LEN);
+  void update(double delta_t, unsigned int len, double dldt);
+  void update(SimParam sim_param, FishParam fish_param);
   void setLambda(double lambda);
   void setPosition(double x, double y, double z);
   void setVelocity(double vx, double vy, double vz);
+  void setVelocity(Vect3 velocity);
   void setDeltaVelocity(double delta_vx, double delta_vy, double delta_vz);
-  inline double getX()const { return x; }
-  inline double getY()const { return y; }
-  inline double getZ()const { return z; }
-  inline double getVx()const { return vx; }
-  inline double getVy()const { return vy; }
-  inline double getVz()const { return vz; }
-  inline double getLambda()const { return lambda; }
-  double speed()const;
+  void setDeltaVelocity(Vect3 delta_velocity);
+  [[nodiscard]] inline Vect3 getPosition() const { return position; }
+  [[nodiscard]] inline Vect3 getVelocity() const { return velocity; }
+  [[nodiscard]] inline Vect3 getDeltaVelocity() const { return delta_velocity; }
+  [[nodiscard]] inline double getLambda() const { return lambda; }
+  [[nodiscard]] double speed() const;
 };
 
-
-double distance(Fish fish1, Fish fish2);
-
-#endif // FISH_HPP
+#endif// FISH_HPP

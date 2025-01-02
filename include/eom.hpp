@@ -1,8 +1,23 @@
-#ifndef EOM_HPP
-#define EOM_HPP
+#ifndef EOM_CPP
+#define EOM_CPP
 
-double g(double distance, double body_length){
-    return distance <= body_length ? body_length/distance : 1.;
-}
+#include "coordinate.hpp"
+#include "fish.hpp"
+#include "simulation.hpp"
+#include <tuple>
 
-#endif // EOM_HPP
+Vect3 calcSelfPropulsion(const Fish &fish, const FishParam &fish_param);
+
+std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
+  const FishParam &fish_param,
+  const std::vector<std::vector<std::vector<std::vector<Fish *>>>> &cells,
+  const std::vector<std::array<int, 3>> &repulsion_boundary,
+  const std::vector<std::array<int, 3>> &repulsion_inner);
+
+std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
+  const FishParam &fish_param,
+  const std::vector<std::vector<std::vector<std::vector<Fish *>>>> &cells,
+  const std::vector<std::array<int, 3>> &attractive_boundary,
+  const std::vector<std::array<int, 3>> &attractive_inner);
+
+#endif// EOM_CPP

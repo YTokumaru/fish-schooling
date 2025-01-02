@@ -1,75 +1,61 @@
 #include "fish.hpp"
 
-Fish::Fish(): x(0), y(0), z(0), vx(0), vy(0), vz(0), lambda(0), delta_vx(0), delta_vy(0), delta_vz(0)
+Fish::Fish() : position({ 0, 0, 0 }), velocity({ 0, 0, 0 }), delta_velocity({ 0, 0, 0 }), lambda(0) {}
+
+Fish::Fish(Vect3 position, Vect3 velocity, Vect3 delta_velocity, double lambda)
+  : position(position), velocity(velocity), delta_velocity(delta_velocity), lambda(lambda)
+{}
+
+Fish::Fish(double x,
+  double y,
+  double z,
+  double vx,
+  double vy,
+  double vz,
+  double delta_vx,
+  double delta_vy,
+  double delta_vz,
+  double lambda)
+  : position({ x, y, z }), velocity({ vx, vy, vz }), delta_velocity({ delta_vx, delta_vy, delta_vz }), lambda(lambda)
+{}
+
+Fish::~Fish() {}
+
+void Fish::update(double delta_t, unsigned int len, double dldt)
 {
+  // TODO: Significant digits may be lost here
+  velocity += delta_velocity;
+
+  // Reset the delta velocity
+  delta_velocity = { 0, 0, 0 };
+
+  position += velocity * delta_t;
+
+  // Account for the periodic boundary conditions
+  position = periodize(position, len);
+
+  if (lambda > 0) { lambda -= dldt * delta_t; }
+  if (lambda < 0) { lambda = 0; }
 }
 
-Fish::~Fish()
+void Fish::update(SimParam sim_param, FishParam fish_param)
 {
+  update(sim_param.delta_t, sim_param.length, fish_param.attraction_str / fish_param.attraction_duration);
 }
 
-void Fish::update(double dt, int LEN)
-{
-    vx += delta_vx;
-    vy += delta_vy;
-    vz += delta_vz;
- 
-    x += vx * dt;
-    y += vy * dt;
-    z += vz * dt;
-    
-    // Account for the periodic boundary conditions
-    x = x < 0 ? x + LEN : x;
-    x = x >= LEN ? x - LEN : x;
-    y = y < 0 ? y + LEN : y;
-    y = y >= LEN ? y - LEN : y;
-    z = z < 0 ? z + LEN : z;
-    z = z >= LEN ? z - LEN : z;
+double Fish::speed() const { return abs(velocity); }
 
-    if (lambda > 0)
-    {
-        lambda -= dt;
-    }
-    if (lambda < 0)
-    {
-        lambda = 0;
-    }
-}
+void Fish::setPosition(double x, double y, double z) { position = { x, y, z }; }
 
-double Fish::speed() const
-{
-    return std::sqrt(vx * vx + vy * vy + vz * vz);
-}
+void Fish::setLambda(double lambda) { this->lambda = lambda; }
 
-void Fish::setPosition(double x, double y, double z)
-{
-    this->x = x;
-    this->y = y;
-    this->z = z;
-}
+void Fish::setVelocity(double vx, double vy, double vz) { velocity = { vx, vy, vz }; }
 
-void Fish::setLambda(double lambda)
-{
-    this->lambda = lambda;
-}
-
-void Fish::setVelocity(double vx, double vy, double vz)
-{
-    this->vx = vx;
-    this->vy = vy;
-    this->vz = vz;
-}
+void Fish::setVelocity(Vect3 velocity) { this->velocity = velocity; }
 
 void Fish::setDeltaVelocity(double delta_vx, double delta_vy, double delta_vz)
 {
-    this->delta_vx = delta_vx;
-    this->delta_vy = delta_vy;
-    this->delta_vz = delta_vz;
+  delta_velocity = { delta_vx, delta_vy, delta_vz };
 }
 
-double distance(Fish fish1, Fish fish2)
-{
-    return std::sqrt((fish1.getX() - fish2.getX()) * (fish1.getX() - fish2.getX()) +
-                     (fish1.getY() - fish2.getY()) * (fish1.getY() - fish2.getY()) +
-                     (fish1.getZ() - fish2.getZ()) * (fish1.getZ() - fish2.getZ()));
-}
+void Fish::setDeltaVelocity(Vect3 delta_velocity) { this->delta_velocity = delta_velocity; }
