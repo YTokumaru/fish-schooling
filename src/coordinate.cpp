@@ -180,7 +180,7 @@ std::vector<std::array<int, 3>> getInnerCells(double radius)
         }
 
         // If all vertices are inside the sphere, then the cell is inside the sphere
-        if (count == distances.size()) { innerCells.push_back({ x, y, z }); }
+        if (count == static_cast<int>(distances.size())) { innerCells.push_back({ x, y, z }); }
       }
     }
   }
@@ -188,10 +188,10 @@ std::vector<std::array<int, 3>> getInnerCells(double radius)
   return innerCells;
 }
 
-std::vector<std::array<int, 3>> getBoundaryBetween(double radius_1, double radius_2)
+std::vector<std::array<int, 3>> getBoundaryBetween(double radius1, double radius2)
 {
-  auto boundary_1 = getBoundaryCells(radius_1);
-  auto boundary_2 = getBoundaryCells(radius_2);
+  auto boundary_1 = getBoundaryCells(radius1);
+  auto boundary_2 = getBoundaryCells(radius2);
 
   // Concatenate the two vectors
   std::vector<std::array<int, 3>> boundaryBetween{};
@@ -216,13 +216,13 @@ std::vector<std::array<int, 3>> getInnerBetween(double radius1, double radius2)
 
   // Remove the cells in inner1 and inner_boundary that are in inner2
   for (auto cell : inner_1) {
-    auto it = std::find(inner_2.begin(), inner_2.end(), cell);
-    if (it != inner_2.end()) { inner_2.erase(it); }
+    auto iter = std::find(inner_2.begin(), inner_2.end(), cell);
+    if (iter != inner_2.end()) { inner_2.erase(iter); }
   }
 
   for (auto cell : inner_boundary) {
-    auto it = std::find(inner_2.begin(), inner_2.end(), cell);
-    if (it != inner_2.end()) { inner_2.erase(it); }
+    auto iter = std::find(inner_2.begin(), inner_2.end(), cell);
+    if (iter != inner_2.end()) { inner_2.erase(iter); }
   }
 
   return inner_2;
