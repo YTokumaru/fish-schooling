@@ -104,8 +104,8 @@ TEST(EOMTest, Attraction)
   // Note that the distance between the two is more than the repulsion radius and less than the attraction radius
   // Also note that the movement of the fish is confined to the xy plane
   // Make sure to set lambda to a positive value
-  Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
-  Fish fish2({ 5.0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
+  Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  Fish fish2({ 5.0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -131,6 +131,13 @@ TEST(EOMTest, Attraction)
 
   auto [delta_v_2, n_fish_2] = calcAttraction(fish2, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_2, 1);
+
+  EXPECT_DOUBLE_EQ(delta_v_1.x, 3 * 7.5);
+  EXPECT_DOUBLE_EQ(delta_v_1.y, -3.0);
+  EXPECT_DOUBLE_EQ(delta_v_1.z, 0);
+  EXPECT_DOUBLE_EQ(delta_v_2.x, -3 * 7.5);
+  EXPECT_DOUBLE_EQ(delta_v_2.y, -3.0);
+  EXPECT_DOUBLE_EQ(delta_v_2.z, 0);
 
   // The movement is confined and must be symmetrical in the xy plane
   EXPECT_DOUBLE_EQ(delta_v_1.x, -delta_v_2.x);

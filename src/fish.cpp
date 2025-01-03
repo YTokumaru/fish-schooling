@@ -34,8 +34,7 @@ void Fish::update(double delta_t, unsigned int len, double dldt)
   // Account for the periodic boundary conditions
   position = periodize(position, len);
 
-  if (lambda > 0) { lambda -= dldt * delta_t; }
-  if (lambda < 0) { lambda = 0; }
+  lambda - dldt *delta_t > 0 ? lambda -= dldt *delta_t : lambda = 0.0;
 }
 
 void Fish::update(SimParam sim_param, FishParam fish_param)
