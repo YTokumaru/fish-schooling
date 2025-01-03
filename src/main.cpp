@@ -34,7 +34,7 @@ int main()
   // Initialize fish with random positions and velocities
   std::random_device rand;
   std::mt19937 gen(rand());
-  std::uniform_real_distribution<double> dis_pos(0.0, sim_param.length);
+  std::uniform_real_distribution<double> dis_pos(0.0, 1.0);
   std::uniform_real_distribution<double> dis_vel(-fish_param.vel_standard, fish_param.vel_standard);
 
   std::vector<Fish> fish(sim_param.n_fish, Fish{});

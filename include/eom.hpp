@@ -4,7 +4,11 @@
 #include "coordinate.hpp"
 #include "fish.hpp"
 #include "simulation.hpp"
+#include <cassert>
 #include <tuple>
+#include <utility>
+
+double g(double distance, double body_length);
 
 Vect3 calcSelfPropulsion(const Fish &fish, const FishParam &fish_param);
 

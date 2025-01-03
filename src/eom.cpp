@@ -2,7 +2,6 @@
 #include "coordinate.hpp"
 #include "fish.hpp"
 #include "simulation.hpp"
-#include <utility>
 
 double g(double distance, double body_length) { return distance <= body_length ? body_length / distance : 1.; }
 
@@ -27,18 +26,24 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
 
   // Loop through the neighboring boundary cells
   for (const auto &boundary_cell_relpos : repulsion_boundary) {
-    unsigned long loop_x = center_x + boundary_cell_relpos[0];
-    unsigned long loop_y = center_y + boundary_cell_relpos[1];
-    unsigned long loop_z = center_z + boundary_cell_relpos[2];
+    int loop_x = static_cast<int>(center_x) + boundary_cell_relpos[0];
+    int loop_y = static_cast<int>(center_y) + boundary_cell_relpos[1];
+    int loop_z = static_cast<int>(center_z) + boundary_cell_relpos[2];
     // Account for the periodic boundary conditions
-    loop_x = (loop_x + cells.size()) % cells.size();
-    loop_y = (loop_y + cells[0].size()) % cells[0].size();
-    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
+    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
+    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
 
-    neighbour_count += cells[loop_x][loop_y][loop_z].size();
+    assert(loop_x >= 0);
+    assert(loop_y >= 0);
+    assert(loop_z >= 0);
+
 
     // Loop through the fish in the neighboring cell
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
+      // Skip the fish itself
+      if (neighbour_fish_ptr == &fish) { continue; }
+
       // Check if the fish is within the repulsion radius
       if (abs(fish.getPosition() - neighbour_fish_ptr->getPosition()) > fish_param.repulsion_radius) { continue; }
 
@@ -51,24 +56,31 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
                            * (fish_param.vel_repulsion / abs(fish.getPosition() - neighbour_fish_ptr->getPosition())
                                 * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition())
                               - fish.getVelocity());
+
+      neighbour_count++;
     }
   }
 
   // Loop through the neighboring inner cells
   for (const auto &inner_cell_relpos : repulsion_inner) {
-    unsigned long loop_x = center_x + inner_cell_relpos[0];
-    unsigned long loop_y = center_y + inner_cell_relpos[1];
-    unsigned long loop_z = center_z + inner_cell_relpos[2];
+    int loop_x = static_cast<int>(center_x) + inner_cell_relpos[0];
+    int loop_y = static_cast<int>(center_y) + inner_cell_relpos[1];
+    int loop_z = static_cast<int>(center_z) + inner_cell_relpos[2];
 
     // Account for the periodic boundary conditions
-    loop_x = (loop_x + cells.size()) % cells.size();
-    loop_y = (loop_y + cells[0].size()) % cells[0].size();
-    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
+    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
+    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
 
-    neighbour_count += cells[loop_x][loop_y][loop_z].size();
+    assert(loop_x >= 0);
+    assert(loop_y >= 0);
+    assert(loop_z >= 0);
+
 
     // Loop through the fish in the neighboring cell
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
+      // Skip the fish itself
+      if (neighbour_fish_ptr == &fish) { continue; }
       // Orientational interaction
       delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
                            * vect12(fish.getVelocity(), neighbour_fish_ptr->getVelocity());
@@ -78,6 +90,8 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
                            * (fish_param.vel_repulsion / abs(fish.getPosition() - neighbour_fish_ptr->getPosition())
                                 * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition())
                               - fish.getVelocity());
+
+      neighbour_count++;
     }
   }
 
@@ -99,19 +113,20 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
 
   // Loop through the neighboring boundary cells
   for (const auto &boundary_cell_relpos : attractive_boundary) {
-    unsigned long loop_x = center_x + boundary_cell_relpos[0];
-    unsigned long loop_y = center_y + boundary_cell_relpos[1];
-    unsigned long loop_z = center_z + boundary_cell_relpos[2];
+    int loop_x = static_cast<int>(center_x) + boundary_cell_relpos[0];
+    int loop_y = static_cast<int>(center_y) + boundary_cell_relpos[1];
+    int loop_z = static_cast<int>(center_z) + boundary_cell_relpos[2];
 
     // Account for the periodic boundary conditions
-    loop_x = (loop_x + cells.size()) % cells.size();
-    loop_y = (loop_y + cells[0].size()) % cells[0].size();
-    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
+    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
+    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
 
-    neighbour_count += cells[loop_x][loop_y][loop_z].size();
 
     // Loop through the fish in the neighboring cell
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
+      // Skip the fish itself
+      if (neighbour_fish_ptr == &fish) { continue; }
       // Check if the fish is within the attraction radius
       if (abs(fish.getPosition() - neighbour_fish_ptr->getPosition()) > fish_param.attraction_radius) {
         continue;
@@ -123,28 +138,33 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
       delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - neighbour_fish_ptr->getPosition()))
                               * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition())
                             - fish.getVelocity();
+
+      neighbour_count++;
     }
   }
 
   // Loop through the neighboring inner cells
   for (const auto &inner_cell_relpos : attractive_inner) {
-    unsigned long loop_x = center_x + inner_cell_relpos[0];
-    unsigned long loop_y = center_y + inner_cell_relpos[1];
-    unsigned long loop_z = center_z + inner_cell_relpos[2];
+    int loop_x = static_cast<int>(center_x) + inner_cell_relpos[0];
+    int loop_y = static_cast<int>(center_y) + inner_cell_relpos[1];
+    int loop_z = static_cast<int>(center_z) + inner_cell_relpos[2];
 
     // Account for the periodic boundary conditions
-    loop_x = (loop_x + cells.size()) % cells.size();
-    loop_y = (loop_y + cells[0].size()) % cells[0].size();
-    loop_z = (loop_z + cells[0][0].size()) % cells[0][0].size();
+    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
+    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
+    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
 
-    neighbour_count += cells[loop_x][loop_y][loop_z].size();
 
     // Loop through the fish in the neighboring cell
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
+      // Skip the fish itself
+      if (neighbour_fish_ptr == &fish) { continue; }
       // Attraction interaction
       delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - neighbour_fish_ptr->getPosition()))
                               * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition())
                             - fish.getVelocity();
+
+      neighbour_count++;
     }
   }
 
