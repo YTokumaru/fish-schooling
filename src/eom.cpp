@@ -95,7 +95,7 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
     }
   }
 
-  return { delta_v_repulsion / neighbour_count, neighbour_count };
+  return { neighbour_count != 0 ? delta_v_repulsion / neighbour_count : Vect3{ 0.0, 0.0, 0.0 }, neighbour_count };
 }
 
 std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
@@ -168,5 +168,6 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     }
   }
 
-  return { fish.getLambda() * delta_v_attraction / neighbour_count, neighbour_count };
+  return { neighbour_count != 0 ? fish.getLambda() * delta_v_attraction / neighbour_count : Vect3{ 0.0, 0.0, 0.0 },
+    neighbour_count };
 }
