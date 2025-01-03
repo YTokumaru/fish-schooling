@@ -69,7 +69,7 @@ int main()
     }
 
     // Loop over the fish and store the delta velocity
-    for (auto one_fish : fish) {
+    for (auto &one_fish : fish) {
 
       // Calculate the self-propulsion
       auto delta_v_self = calcSelfPropulsion(one_fish, fish_param);
