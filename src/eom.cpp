@@ -49,7 +49,7 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
       // Repulsion interaction
       delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
                            * (fish_param.vel_repulsion / abs(fish.getPosition() - neighbour_fish_ptr->getPosition())
-                                * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition())
+                                * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition())
                               - fish.getVelocity());
     }
   }
@@ -76,7 +76,7 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
       // Repulsion interaction
       delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
                            * (fish_param.vel_repulsion / abs(fish.getPosition() - neighbour_fish_ptr->getPosition())
-                                * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition())
+                                * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition())
                               - fish.getVelocity());
     }
   }
@@ -121,7 +121,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
 
       // Attraction interaction
       delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - neighbour_fish_ptr->getPosition()))
-                              * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition())
+                              * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition())
                             - fish.getVelocity();
     }
   }
@@ -143,7 +143,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
       // Attraction interaction
       delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - neighbour_fish_ptr->getPosition()))
-                              * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition())
+                              * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition())
                             - fish.getVelocity();
     }
   }
