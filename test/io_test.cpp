@@ -33,6 +33,7 @@ protected:
               n-fish: 1000
               max-steps: 1000
               delta-t: 0.01
+              snapshot-interval: 100
             fish-params:
               vel-standard: 1.5
               vel-repulsion: 1.5
@@ -112,6 +113,7 @@ TEST_F(ConfigLoaderTest, WrongDataType)
           n-fish: "1000"
           max-steps: "1000"
           delta-t: "0.01"
+          snapshot-interval: "100"
         fish-params:
           vel-standard: "1.5"
           vel-repulsion: "1.5"
@@ -136,6 +138,7 @@ TEST_F(ConfigLoaderTest, NegativeValues)
           n-fish: -1000
           max-steps: -1000
           delta-t: -0.01
+          snapshot-interval: -100
         fish-params:
           vel-standard: -1.5
           vel-repulsion: -1.5

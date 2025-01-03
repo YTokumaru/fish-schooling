@@ -9,6 +9,7 @@ int operator>>(const YAML::Node &node, SimParam &param)
     param.n_fish = sim_params["n-fish"].as<unsigned int>();
     param.max_steps = sim_params["max-steps"].as<unsigned int>();
     param.delta_t = sim_params["delta-t"].as<double>();
+    param.snapshot_interval = sim_params["snapshot-interval"].as<unsigned int>();
   } catch (YAML::Exception &e) {
     std::cerr << "Error while reading from file: " << e.what() << std::endl;
     return EXIT_FAILURE;

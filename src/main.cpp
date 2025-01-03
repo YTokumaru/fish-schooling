@@ -89,10 +89,12 @@ int main()
     // Update the fish positions and velocities
     for (auto &one_fish : fish) { one_fish.update(sim_param, fish_param); }
 
-    // Output the fish positions
-    for (auto &one_fish : fish) {
-      auto [x, y, z] = one_fish.getPosition();
-      output_file << x << " " << y << " " << z << '\n';
+    if (time_step % sim_param.snapshot_interval == 0) {
+      // Output the fish positions
+      for (auto &one_fish : fish) {
+        auto [x, y, z] = one_fish.getPosition();
+        output_file << x << " " << y << " " << z << '\n';
+      }
     }
   }
 
