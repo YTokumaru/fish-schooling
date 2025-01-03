@@ -1,3 +1,4 @@
+#include "gtest/gtest.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -70,12 +71,12 @@ TEST(FishTest, Update)
   SimParam sim_param{ 100, 1000, 1000, 0.01 };
   FishParam fish_param{ 1.5, 1.5, 7.5, 1.0, 1.0, 7.5, 3, 15.0, 1.0 };
   fish.update(sim_param, fish_param);
-  ASSERT_NEAR(fish.getPosition().x, 0.011, 1e-6);
-  ASSERT_NEAR(fish.getPosition().y, 0.011, 1e-6);
-  ASSERT_NEAR(fish.getPosition().z, 0.011, 1e-6);
-  ASSERT_DOUBLE_EQ(fish.getVelocity().x, 1.1);
-  ASSERT_DOUBLE_EQ(fish.getVelocity().y, 1.1);
-  ASSERT_DOUBLE_EQ(fish.getVelocity().z, 1.1);
+  ASSERT_NEAR(fish.getPosition().x, (1.0 + 0.1 * 0.01) * 0.01, 1e-6);
+  ASSERT_NEAR(fish.getPosition().y, (1.0 + 0.1 * 0.01) * 0.01, 1e-6);
+  ASSERT_NEAR(fish.getPosition().z, (1.0 + 0.1 * 0.01) * 0.01, 1e-6);
+  ASSERT_DOUBLE_EQ(fish.getVelocity().x, 1.0 + 0.1 * 0.01);
+  ASSERT_DOUBLE_EQ(fish.getVelocity().y, 1.0 + 0.1 * 0.01);
+  ASSERT_DOUBLE_EQ(fish.getVelocity().z, 1.0 + 0.1 * 0.01);
   ASSERT_DOUBLE_EQ(fish.getDeltaVelocity().x, 0.0);
   ASSERT_DOUBLE_EQ(fish.getDeltaVelocity().y, 0.0);
   ASSERT_DOUBLE_EQ(fish.getDeltaVelocity().z, 0.0);

@@ -24,7 +24,7 @@ Fish::~Fish() {}
 void Fish::update(double delta_t, unsigned int len, double dldt)
 {
   // TODO: Significant digits may be lost here
-  velocity += delta_velocity;
+  velocity += delta_velocity * delta_t;
 
   // Reset the delta velocity
   delta_velocity = { 0, 0, 0 };
