@@ -51,6 +51,8 @@ TEST(EOMTest, Repulsion)
   Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
   Fish fish2({ 0.5, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
 
+  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 2 };
+
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
@@ -73,11 +75,11 @@ TEST(EOMTest, Repulsion)
   EXPECT_EQ(inner.size(), 0);
   EXPECT_THAT(boundary, UnorderedElementsAreArray(std::vector<std::array<int, 3>>({ { 0, 0, 0 } })));
 
-  auto [delta_v_1, n_fish_1] = calcRepulsion(fish1, fish_param, cells, boundary, inner);
+  auto [delta_v_1, n_fish_1] = calcRepulsion(fish1, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_1, 1);
   fish1.setDeltaVelocity(delta_v_1);
 
-  auto [delta_v_2, n_fish_2] = calcRepulsion(fish2, fish_param, cells, boundary, inner);
+  auto [delta_v_2, n_fish_2] = calcRepulsion(fish2, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_2, 1);
   fish2.setDeltaVelocity(delta_v_2);
 
@@ -107,6 +109,8 @@ TEST(EOMTest, Attraction)
   Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
   Fish fish2({ 5.0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
 
+  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 2 };
+
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
@@ -126,10 +130,10 @@ TEST(EOMTest, Attraction)
   auto inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
   auto boundary = getBoundaryBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
 
-  auto [delta_v_1, n_fish_1] = calcAttraction(fish1, fish_param, cells, boundary, inner);
+  auto [delta_v_1, n_fish_1] = calcAttraction(fish1, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_1, 1);
 
-  auto [delta_v_2, n_fish_2] = calcAttraction(fish2, fish_param, cells, boundary, inner);
+  auto [delta_v_2, n_fish_2] = calcAttraction(fish2, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_2, 1);
 
   EXPECT_DOUBLE_EQ(delta_v_1.x, 3 * 7.5);
@@ -152,6 +156,8 @@ TEST(EOMTest, NoOtherFishAttraction)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
 
+  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 1 };
+
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
@@ -170,7 +176,7 @@ TEST(EOMTest, NoOtherFishAttraction)
   auto inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
   auto boundary = getBoundaryBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
 
-  auto [delta_v, n_fish] = calcAttraction(fish, fish_param, cells, boundary, inner);
+  auto [delta_v, n_fish] = calcAttraction(fish, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish, 0);
   EXPECT_DOUBLE_EQ(delta_v.x, 0);
   EXPECT_DOUBLE_EQ(delta_v.y, 0);
@@ -180,6 +186,8 @@ TEST(EOMTest, NoOtherFishAttraction)
 TEST(EOMTest, NoOtherFishRepultion)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
+
+  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 1 };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -199,7 +207,7 @@ TEST(EOMTest, NoOtherFishRepultion)
   auto inner = getInnerCells(fish_param.repulsion_radius);
   auto boundary = getBoundaryCells(fish_param.repulsion_radius);
 
-  auto [delta_v, n_fish] = calcRepulsion(fish, fish_param, cells, boundary, inner);
+  auto [delta_v, n_fish] = calcRepulsion(fish, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish, 0);
   EXPECT_DOUBLE_EQ(delta_v.x, 0);
   EXPECT_DOUBLE_EQ(delta_v.y, 0);

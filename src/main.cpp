@@ -75,12 +75,12 @@ int main()
       auto delta_v_self = calcSelfPropulsion(one_fish, fish_param);
 
       auto [delta_v_repulsion, n_fish_repulsion] =
-        calcRepulsion(one_fish, fish_param, cells, repulsion_boundary, repulsion_inner);
+        calcRepulsion(one_fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner);
 
       if (n_fish_repulsion <= fish_param.n_cog) { one_fish.setLambda(fish_param.attraction_str); }
 
       auto [delta_v_attraction, n_fish_attrac] =
-        calcAttraction(one_fish, fish_param, cells, attractive_boundary, attractive_inner);
+        calcAttraction(one_fish, sim_param, fish_param, cells, attractive_boundary, attractive_inner);
 
       one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion + delta_v_attraction);
     }
