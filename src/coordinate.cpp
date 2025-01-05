@@ -1,4 +1,5 @@
 #include "coordinate.hpp"
+#include <cassert>
 
 Vect3 operator+(const Vect3 &lhs, const Vect3 &rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z }; }
 
@@ -65,6 +66,29 @@ Vect3 normalize(const Vect3 &vect)
 Vect3 vect12(const Vect3 &vect1, const Vect3 &vect2)
 {
   return { vect2.x - vect1.x, vect2.y - vect1.y, vect2.z - vect1.z };
+}
+
+Vect3 vect12(const Vect3 &vect1, Vect3 vect2, unsigned int len)
+{
+  Vect3 temp_vect = vect12(vect1, vect2);
+
+  if (temp_vect.x > static_cast<double>(len) / 2) {
+    vect2.x -= len;
+  } else if (temp_vect.x < -static_cast<double>(len) / 2) {
+    vect2.x += len;
+  }
+  if (temp_vect.y > static_cast<double>(len) / 2) {
+    vect2.y -= len;
+  } else if (temp_vect.y < -static_cast<double>(len) / 2) {
+    vect2.y += len;
+  }
+  if (temp_vect.z > static_cast<double>(len) / 2) {
+    vect2.z -= len;
+  } else if (temp_vect.z < -static_cast<double>(len) / 2) {
+    vect2.z += len;
+  }
+
+  return vect12(vect1, vect2);
 }
 
 
