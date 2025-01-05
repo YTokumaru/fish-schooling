@@ -24,7 +24,7 @@ Vect3 operator-=(Vect3 &lhs, const Vect3 &rhs);
 Vect3 operator*=(Vect3 &lhs, double scalar);
 Vect3 operator/=(Vect3 &lhs, double scalar);
 
-Vect3 periodize(const Vect3 &vect, double len);
+Vect3 periodize(const Vect3 &vect, unsigned int len);
 
 std::vector<std::array<int, 3>> getBoundaryCells(double radius);
 

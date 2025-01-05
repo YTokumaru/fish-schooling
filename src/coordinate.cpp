@@ -42,9 +42,17 @@ Vect3 operator/=(Vect3 &lhs, double scalar)
   return lhs;
 }
 
-Vect3 periodize(const Vect3 &vect, double len)
+Vect3 periodize(const Vect3 &vect, unsigned int len)
 {
-  return { std::fmod(vect.x + len, len), std::fmod(vect.y + len, len), std::fmod(vect.z + len, len) };
+  return { vect.x > len ? vect.x - len
+           : vect.x < 0 ? vect.x + len
+                        : vect.x,
+    vect.y > len ? vect.y - len
+    : vect.y < 0 ? vect.y + len
+                 : vect.y,
+    vect.z > len ? vect.z - len
+    : vect.z < 0 ? vect.z + len
+                 : vect.z };
 }
 
 double abs(const Vect3 &vect) { return std::sqrt(vect.x * vect.x + vect.y * vect.y + vect.z * vect.z); }
