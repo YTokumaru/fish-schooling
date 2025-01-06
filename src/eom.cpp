@@ -3,6 +3,41 @@
 #include "fish.hpp"
 #include "simulation.hpp"
 
+Vect3 calcDeltaVRepulsion(const Fish &fish,
+  const Fish &other_fish,
+  const SimParam &sim_param,
+  const FishParam &fish_param)
+{
+  Vect3 delta_v_repulsion{ 0.0, 0.0, 0.0 };
+
+  // Orientational interaction
+  delta_v_repulsion += g(abs(fish.getPosition() - other_fish.getPosition()), fish_param.body_length)
+                       * vect12(fish.getVelocity(), other_fish.getVelocity(), sim_param.length);
+
+  // Repulsion interaction
+  delta_v_repulsion += g(abs(fish.getPosition() - other_fish.getPosition()), fish_param.body_length)
+                       * (fish_param.vel_repulsion / abs(fish.getPosition() - other_fish.getPosition())
+                            * vect12(other_fish.getPosition(), fish.getPosition(), sim_param.length)
+                          - fish.getVelocity());
+
+  return delta_v_repulsion;
+}
+
+Vect3 calcDeltaVAttraction(const Fish &fish,
+  const Fish &other_fish,
+  const SimParam &sim_param,
+  const FishParam &fish_param)
+{
+  Vect3 delta_v_attraction{ 0.0, 0.0, 0.0 };
+
+  // Attraction interaction
+  delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - other_fish.getPosition()))
+                          * vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)
+                        - fish.getVelocity();
+
+  return delta_v_attraction;
+}
+
 double g(double distance, double body_length) { return distance <= body_length ? body_length / distance : 1.; }
 
 Vect3 calcSelfPropulsion(const Fish &fish, const FishParam &fish_param)
@@ -48,15 +83,7 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
       // Check if the fish is within the repulsion radius
       if (abs(fish.getPosition() - neighbour_fish_ptr->getPosition()) > fish_param.repulsion_radius) { continue; }
 
-      // Orientational interaction
-      delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
-                           * vect12(fish.getVelocity(), neighbour_fish_ptr->getVelocity(), sim_param.length);
-
-      // Repulsion interaction
-      delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
-                           * (fish_param.vel_repulsion / abs(fish.getPosition() - neighbour_fish_ptr->getPosition())
-                                * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition(), sim_param.length)
-                              - fish.getVelocity());
+      delta_v_repulsion += calcDeltaVRepulsion(fish, *neighbour_fish_ptr, sim_param, fish_param);
 
       neighbour_count++;
     }
@@ -82,15 +109,8 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
       // Skip the fish itself
       if (neighbour_fish_ptr == &fish) { continue; }
-      // Orientational interaction
-      delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
-                           * vect12(fish.getVelocity(), neighbour_fish_ptr->getVelocity(), sim_param.length);
 
-      // Repulsion interaction
-      delta_v_repulsion += g(abs(fish.getPosition() - neighbour_fish_ptr->getPosition()), fish_param.body_length)
-                           * (fish_param.vel_repulsion / abs(fish.getPosition() - neighbour_fish_ptr->getPosition())
-                                * vect12(neighbour_fish_ptr->getPosition(), fish.getPosition(), sim_param.length)
-                              - fish.getVelocity());
+      delta_v_repulsion += calcDeltaVRepulsion(fish, *neighbour_fish_ptr, sim_param, fish_param);
 
       neighbour_count++;
     }
@@ -137,9 +157,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
       }
 
       // Attraction interaction
-      delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - neighbour_fish_ptr->getPosition()))
-                              * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length)
-                            - fish.getVelocity();
+      delta_v_attraction += calcDeltaVAttraction(fish, *neighbour_fish_ptr, sim_param, fish_param);
 
       neighbour_count++;
     }
@@ -162,9 +180,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
       // Skip the fish itself
       if (neighbour_fish_ptr == &fish) { continue; }
       // Attraction interaction
-      delta_v_attraction += (fish_param.vel_escape / abs(fish.getPosition() - neighbour_fish_ptr->getPosition()))
-                              * vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length)
-                            - fish.getVelocity();
+      delta_v_attraction += calcDeltaVAttraction(fish, *neighbour_fish_ptr, sim_param, fish_param);
 
       neighbour_count++;
     }

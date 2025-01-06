@@ -19,8 +19,8 @@ class ConfigLoaderTest : public ::testing::Test
 {
 protected:
   MockYAML mock_yaml;
-  SimParam sim_param;
-  FishParam fish_param;
+  SimParam sim_param{};
+  FishParam fish_param{};
 
   YAML::Node validConfig;
 

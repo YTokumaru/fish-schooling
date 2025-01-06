@@ -2,14 +2,13 @@
 #include "eom.hpp"
 #include "fish.hpp"
 #include "simulation.hpp"
-#include "gmock/gmock.h"
 #include <cmath>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-TEST(EOMTest, Gfactor)
+TEST(EOMTest, GFactor)
 {
   // Test the g factor for the repulsion interaction
   // The g factor is defined as the ratio of the body length to the distance between the fish
@@ -91,7 +90,7 @@ TEST(EOMTest, Repulsion)
   EXPECT_DOUBLE_EQ(delta_v_2.y, -2);
   EXPECT_DOUBLE_EQ(delta_v_2.z, 0);
 
-  // The delta velocities should be euqal and opposite
+  // The delta velocities should be equal and opposite
   EXPECT_DOUBLE_EQ(delta_v_1.x, -delta_v_2.x);
   EXPECT_TRUE(delta_v_1.x < 0);
   EXPECT_TRUE(delta_v_2.x > 0);
@@ -183,7 +182,7 @@ TEST(EOMTest, NoOtherFishAttraction)
   EXPECT_DOUBLE_EQ(delta_v.z, 0);
 }
 
-TEST(EOMTest, NoOtherFishRepultion)
+TEST(EOMTest, NoOtherFishRepulsion)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
 

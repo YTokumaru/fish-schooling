@@ -32,7 +32,7 @@ void Fish::update(double delta_t, unsigned int len, double dldt)
   position += velocity * delta_t;
 
   // Account for the periodic boundary conditions
-  position = periodize(position, len);
+  position = periodic(position, len);
 
   lambda - dldt *delta_t > 0 ? lambda -= dldt *delta_t : lambda = 0.0;
 }
