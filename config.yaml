@@ -1,10 +1,10 @@
 ---
 simulation-params:
-  length: 64
-  n-fish: 1000
+  length: 32
+  n-fish: 3000
   max-steps: 1000
   delta-t: 0.01
-  snapshot-interval: 100
+  snapshot-interval: 10
 fish-params:
   vel-standard: 1.5
   vel-repulsion: 1.5

@@ -24,6 +24,18 @@ macro(project_setup_options)
         option(PROJECT_BUILD_TESTS "Build tests" OFF)
         option(PROJECT_COMPILER_WARNINGS "Enable compiler warnings" OFF)
     endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        # Compiler flags
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -g -shared-libgcc")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -shared-libgcc")
+
+        option(PROJECT_ENABLE_CLANG_TIDY "Enable clang-tidy checks" ON)
+        option(PROJECT_ENABLE_CPPCHECK "Enable cppcheck checks" ON)
+        option(PROJECT_ENABLE_WARNINGS "Enable compiler warnings" ON)
+        option(PROJECT_ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+        option(PROJECT_BUILD_TESTS "Build tests" ON)
+        option(PROJECT_COMPILER_WARNINGS "Enable compiler warnings" ON)
+    endif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     
     
     add_library(project_warnings INTERFACE)

@@ -146,9 +146,9 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     int loop_z = static_cast<int>(center_z) + boundary_cell_relpos[2];
 
     // Account for the periodic boundary conditions
-    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
-    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
-    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
+    loop_x = (loop_x + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
+    loop_y = (loop_y + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
+    loop_z = (loop_z + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
 
 
     // Loop through the fish in the neighboring cell
@@ -178,9 +178,9 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     int loop_z = static_cast<int>(center_z) + inner_cell_relpos[2];
 
     // Account for the periodic boundary conditions
-    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
-    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
-    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
+    loop_x = (loop_x + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
+    loop_y = (loop_y + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
+    loop_z = (loop_z + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
 
 
     // Loop through the fish in the neighboring cell
