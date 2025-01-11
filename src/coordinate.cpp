@@ -1,5 +1,5 @@
 #include "coordinate.hpp"
-#include <cassert>
+#include <vector>
 
 Vect3 operator+(const Vect3 &lhs, const Vect3 &rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z }; }
 
@@ -91,128 +91,108 @@ Vect3 vect12(const Vect3 &vect1, Vect3 vect2, unsigned int len)
   return vect12(vect1, vect2);
 }
 
-
-std::vector<std::array<int, 3>> getBoundaryCells(double radius)
+unsigned int countInside(const std::array<int, 3> &cell, double radius, const Vect3 &center, bool count_boundary)
 {
-  double cell_length = 1.0;
 
-  if (radius <= 0) { return {}; }
+  const std::array<Vect3, 6> faces_relpos = {
+    { { 0.5, 0, 0 }, { -0.5, 0, 0 }, { 0, 0.5, 0 }, { 0, -0.5, 0 }, { 0, 0, 0.5 }, { 0, 0, -0.5 } }
+  };
 
-  if (radius <= cell_length / 2) { return { { 0, 0, 0 } }; }
+  const std::array<Vect3, 8> vertices_relpos = { { { 0.5, 0.5, 0.5 },
+    { 0.5, 0.5, -0.5 },
+    { 0.5, -0.5, 0.5 },
+    { 0.5, -0.5, -0.5 },
+    { -0.5, 0.5, 0.5 },
+    { -0.5, 0.5, -0.5 },
+    { -0.5, -0.5, 0.5 },
+    { -0.5, -0.5, -0.5 } } };
 
+  const std::array<Vect3, 12> edges_relpos = { { { 0.5, 0.5, 0 },
+    { 0.5, -0.5, 0 },
+    { 0.5, 0, 0.5 },
+    { 0.5, 0, -0.5 },
+    { 0, 0.5, 0.5 },
+    { 0, 0.5, -0.5 },
+    { -0.5, 0.5, 0 },
+    { -0.5, -0.5, 0 },
+    { -0.5, 0, 0.5 },
+    { -0.5, 0, -0.5 },
+    { 0, -0.5, 0.5 },
+    { 0, -0.5, -0.5 } } };
 
-  int cellRadius = static_cast<int>(radius) + 1;
+  unsigned int inside_count = 0;
 
-  // Scan through the cells
+  for (const auto &face : faces_relpos) {
+    Vect3 face_pos = { static_cast<double>(cell[0]) + face.x,
+      static_cast<double>(cell[1]) + face.y,
+      static_cast<double>(cell[2]) + face.z };
+    Vect3 face_vect = vect12(center, face_pos);
+    if (count_boundary) {
+      if (abs(face_vect) < radius) { inside_count++; }
+    } else {
+      if (abs(face_vect) <= radius) { inside_count++; }
+    }
+  }
+
+  for (const auto &vertex : vertices_relpos) {
+    Vect3 vertex_pos = { static_cast<double>(cell[0]) + vertex.x,
+      static_cast<double>(cell[1]) + vertex.y,
+      static_cast<double>(cell[2]) + vertex.z };
+    Vect3 vertex_vect = vect12(center, vertex_pos);
+    if (count_boundary) {
+      if (abs(vertex_vect) < radius) { inside_count++; }
+    } else {
+      if (abs(vertex_vect) <= radius) { inside_count++; }
+    }
+  }
+
+  for (const auto &edge : edges_relpos) {
+    Vect3 edge_pos = { static_cast<double>(cell[0]) + edge.x,
+      static_cast<double>(cell[1]) + edge.y,
+      static_cast<double>(cell[2]) + edge.z };
+    Vect3 edge_vect = vect12(center, edge_pos);
+    if (count_boundary) {
+      if (abs(edge_vect) < radius) { inside_count++; }
+    } else {
+      if (abs(edge_vect) <= radius) { inside_count++; }
+    }
+  }
+
+  return inside_count;
+}
+
+bool isCellOnBoundary(const std::array<int, 3> &cell, double radius, const Vect3 &center)
+{
+  unsigned int inside_count = countInside(cell, radius, center, true);
+
+  const unsigned int face_count = 6;
+  const unsigned int vertex_count = 8;
+  const unsigned int edge_count = 12;
+
+  return inside_count > 0 && inside_count < face_count + vertex_count + edge_count;
+}
+
+bool isCellInside(const std::array<int, 3> &cell, double radius, const Vect3 &center)
+{
+  unsigned int inside_count = countInside(cell, radius, center, false);
+
+  const unsigned int face_count = 6;
+  const unsigned int vertex_count = 8;
+  const unsigned int edge_count = 12;
+
+  return inside_count == face_count + vertex_count + edge_count;
+}
+
+std::vector<std::array<int, 3>> getBoundaryCells(double radius, const Vect3 &center)
+{
   std::vector<std::array<int, 3>> boundaryCells{};
-  for (int cell_x = -cellRadius; cell_x <= cellRadius; cell_x++) {
-    for (int cell_y = -cellRadius; cell_y <= cellRadius; cell_y++) {
-      for (int cell_z = -cellRadius; cell_z <= cellRadius; cell_z++) {
-        // Check if the cell is intersecting the sphere
-        // Check distance with all vertices
-        double vertex1 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex2 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double vertex3 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex4 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double vertex5 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex6 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double vertex7 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex8 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
 
-        // Check distance with all faces
-        double face1 =
-          std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2) + cell_y * cell_y + cell_z * cell_z);
-        double face2 =
-          std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2) + cell_y * cell_y + cell_z * cell_z);
-        double face3 =
-          std::sqrt(cell_x * cell_x + (cell_y - cell_length / 2) * (cell_y - cell_length / 2) + cell_z * cell_z);
-        double face4 =
-          std::sqrt(cell_x * cell_x + (cell_y + cell_length / 2) * (cell_y + cell_length / 2) + cell_z * cell_z);
-        double face5 =
-          std::sqrt(cell_x * cell_x + cell_y * cell_y + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double face6 =
-          std::sqrt(cell_x * cell_x + cell_y * cell_y + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
+  int cell_radius = static_cast<int>(radius) + 1;
 
-        // Check distance with all edges
-        double edge1 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                 + (cell_y - cell_length / 2) * (cell_y - cell_length / 2) + cell_z * cell_z);
-        double edge2 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                 + (cell_y + cell_length / 2) * (cell_y + cell_length / 2) + cell_z * cell_z);
-        double edge3 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                 + (cell_y - cell_length / 2) * (cell_y - cell_length / 2) + cell_z * cell_z);
-        double edge4 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                 + (cell_y + cell_length / 2) * (cell_y + cell_length / 2) + cell_z * cell_z);
-        double edge5 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2) + cell_y * cell_y
-                                 + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double edge6 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2) + cell_y * cell_y
-                                 + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double edge7 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2) + cell_y * cell_y
-                                 + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double edge8 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2) + cell_y * cell_y
-                                 + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double edge9 = std::sqrt(cell_x * cell_x + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                 + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double edge10 = std::sqrt(cell_x * cell_x + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                  + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double edge11 = std::sqrt(cell_x * cell_x + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                  + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double edge12 = std::sqrt(cell_x * cell_x + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                  + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-
-        // If at least one of the distance is less than the radius (but not all), then the cell is intersecting the
-        // sphere
-        auto distances = { vertex1,
-          vertex2,
-          vertex3,
-          vertex4,
-          vertex5,
-          vertex6,
-          vertex7,
-          vertex8,
-          face1,
-          face2,
-          face3,
-          face4,
-          face5,
-          face6,
-          edge1,
-          edge2,
-          edge3,
-          edge4,
-          edge5,
-          edge6,
-          edge7,
-          edge8,
-          edge9,
-          edge10,
-          edge11,
-          edge12 };
-
-        int count = 0;
-        for (auto distance : distances) {
-          if (distance < radius) { count++; }
-        }
-
-        constexpr int vertex_count = 8;
-        constexpr int face_count = 6;
-        constexpr int edge_count = 12;
-        if (count > 0 && count < vertex_count + face_count + edge_count) {
+  for (int cell_x = -cell_radius; cell_x <= cell_radius; cell_x++) {
+    for (int cell_y = -cell_radius; cell_y <= cell_radius; cell_y++) {
+      for (int cell_z = -cell_radius; cell_z <= cell_radius; cell_z++) {
+        if (isCellOnBoundary({ cell_x, cell_y, cell_z }, radius, center)) {
           boundaryCells.push_back({ cell_x, cell_y, cell_z });
         }
       }
@@ -222,61 +202,148 @@ std::vector<std::array<int, 3>> getBoundaryCells(double radius)
   return boundaryCells;
 }
 
-std::vector<std::array<int, 3>> getInnerCells(double radius)
+std::vector<std::array<int, 3>> getInnerCells(double radius, const Vect3 &center)
 {
-  double cell_length = 1.0;
-
-  if (radius <= std::sqrt(3 * (cell_length / 2) * (cell_length / 2))) { return {}; }
-
-  int cellRadius = static_cast<int>(radius) + 1;
-
-  // Scan through the cells
   std::vector<std::array<int, 3>> innerCells{};
-  for (int cell_x = -cellRadius; cell_x <= cellRadius; cell_x++) {
-    for (int cell_y = -cellRadius; cell_y <= cellRadius; cell_y++) {
-      for (int cell_z = -cellRadius; cell_z <= cellRadius; cell_z++) {
-        // Check if the cell is intersecting the sphere
-        // Check distance with all vertices
-        double vertex1 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex2 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double vertex3 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex4 = std::sqrt((cell_x - cell_length / 2) * (cell_x - cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double vertex5 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex6 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y - cell_length / 2) * (cell_y - cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
-        double vertex7 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z - cell_length / 2) * (cell_z - cell_length / 2));
-        double vertex8 = std::sqrt((cell_x + cell_length / 2) * (cell_x + cell_length / 2)
-                                   + (cell_y + cell_length / 2) * (cell_y + cell_length / 2)
-                                   + (cell_z + cell_length / 2) * (cell_z + cell_length / 2));
 
-        // If at least one of the distance is less than the radius (but not all), then the cell is intersecting the
-        // sphere
-        auto distances = { vertex1, vertex2, vertex3, vertex4, vertex5, vertex6, vertex7, vertex8 };
-        int count = 0;
-        for (auto distance : distances) {
-          if (distance < radius) { count++; }
+
+  int cell_radius = static_cast<int>(radius) + 1;
+
+  for (int cell_x = -cell_radius; cell_x <= cell_radius; cell_x++) {
+    for (int cell_y = -cell_radius; cell_y <= cell_radius; cell_y++) {
+      for (int cell_z = -cell_radius; cell_z <= cell_radius; cell_z++) {
+        if (isCellInside({ cell_x, cell_y, cell_z }, radius, center)) {
+          innerCells.push_back({ cell_x, cell_y, cell_z });
         }
-
-        // If all vertices are inside the sphere, then the cell is inside the sphere
-        if (count == static_cast<int>(distances.size())) { innerCells.push_back({ cell_x, cell_y, cell_z }); }
       }
     }
   }
 
   return innerCells;
+}
+
+
+std::vector<std::array<int, 3>> getBoundaryCells(double radius)
+{
+  const std::array<Vect3, 6> faces_pos = {
+    { { 0.5, 0, 0 }, { -0.5, 0, 0 }, { 0, 0.5, 0 }, { 0, -0.5, 0 }, { 0, 0, 0.5 }, { 0, 0, -0.5 } }
+  };
+
+  const std::array<Vect3, 8> vertices_pos = { { { 0.5, 0.5, 0.5 },
+    { 0.5, 0.5, -0.5 },
+    { 0.5, -0.5, 0.5 },
+    { 0.5, -0.5, -0.5 },
+    { -0.5, 0.5, 0.5 },
+    { -0.5, 0.5, -0.5 },
+    { -0.5, -0.5, 0.5 },
+    { -0.5, -0.5, -0.5 } } };
+
+  const std::array<Vect3, 12> edges_pos = { { { 0.5, 0.5, 0 },
+    { 0.5, -0.5, 0 },
+    { 0.5, 0, 0.5 },
+    { 0.5, 0, -0.5 },
+    { 0, 0.5, 0.5 },
+    { 0, 0.5, -0.5 },
+    { -0.5, 0.5, 0 },
+    { -0.5, -0.5, 0 },
+    { -0.5, 0, 0.5 },
+    { -0.5, 0, -0.5 },
+    { 0, -0.5, 0.5 },
+    { 0, -0.5, -0.5 } } };
+
+  // Calculate the boundary cells with using the relative positions of the faces, vertices, and edges
+  // and calculate the OR of the cells that are intersecting the sphere
+
+  std::vector<std::array<int, 3>> boundary_cells{};
+
+  for (const auto &face : faces_pos) {
+    auto face_boundary_cells = getBoundaryCells(radius, face);
+    boundary_cells.insert(boundary_cells.end(), face_boundary_cells.begin(), face_boundary_cells.end());
+  }
+
+  for (const auto &vertex : vertices_pos) {
+    auto vertex_boundary_cells = getBoundaryCells(radius, vertex);
+    boundary_cells.insert(boundary_cells.end(), vertex_boundary_cells.begin(), vertex_boundary_cells.end());
+  }
+
+  for (const auto &edge : edges_pos) {
+    auto edge_boundary_cells = getBoundaryCells(radius, edge);
+    boundary_cells.insert(boundary_cells.end(), edge_boundary_cells.begin(), edge_boundary_cells.end());
+  }
+
+  // Remove duplicates
+  std::sort(boundary_cells.begin(), boundary_cells.end());
+  boundary_cells.erase(std::unique(boundary_cells.begin(), boundary_cells.end()), boundary_cells.end());
+
+  return boundary_cells;
+}
+
+
+std::vector<std::array<int, 3>> getInnerCells(double radius)
+{
+  const std::array<Vect3, 6> faces_pos = {
+    { { 0.5, 0, 0 }, { -0.5, 0, 0 }, { 0, 0.5, 0 }, { 0, -0.5, 0 }, { 0, 0, 0.5 }, { 0, 0, -0.5 } }
+  };
+
+  const std::array<Vect3, 8> vertices_pos = { { { 0.5, 0.5, 0.5 },
+    { 0.5, 0.5, -0.5 },
+    { 0.5, -0.5, 0.5 },
+    { 0.5, -0.5, -0.5 },
+    { -0.5, 0.5, 0.5 },
+    { -0.5, 0.5, -0.5 },
+    { -0.5, -0.5, 0.5 },
+    { -0.5, -0.5, -0.5 } } };
+
+  const std::array<Vect3, 12> edges_pos = { { { 0.5, 0.5, 0 },
+    { 0.5, -0.5, 0 },
+    { 0.5, 0, 0.5 },
+    { 0.5, 0, -0.5 },
+    { 0, 0.5, 0.5 },
+    { 0, 0.5, -0.5 },
+    { -0.5, 0.5, 0 },
+    { -0.5, -0.5, 0 },
+    { -0.5, 0, 0.5 },
+    { -0.5, 0, -0.5 },
+    { 0, -0.5, 0.5 },
+    { 0, -0.5, -0.5 } } };
+
+  // Calculate the inner cells with using the relative positions of the faces, vertices, and edges
+  // and calculate the AND of the cells that are inside the sphere
+
+  std::vector<std::array<int, 3>> inner_cells{};
+
+  for (const auto &face : faces_pos) {
+    auto face_inner_cells = getInnerCells(radius, face);
+    inner_cells.insert(inner_cells.end(), face_inner_cells.begin(), face_inner_cells.end());
+  }
+
+  for (const auto &vertex : vertices_pos) {
+    auto vertex_inner_cells = getInnerCells(radius, vertex);
+    inner_cells.insert(inner_cells.end(), vertex_inner_cells.begin(), vertex_inner_cells.end());
+  }
+
+  for (const auto &edge : edges_pos) {
+    auto edge_inner_cells = getInnerCells(radius, edge);
+    inner_cells.insert(inner_cells.end(), edge_inner_cells.begin(), edge_inner_cells.end());
+  }
+
+  // Only keep the duplicates
+  std::vector<std::array<int, 3>> inner_cells_and{};
+
+  const int face_count = 6;
+  const int vertex_count = 8;
+  const int edge_count = 12;
+  for (const auto &cell : inner_cells) {
+    if (std::count(inner_cells.begin(), inner_cells.end(), cell) == face_count + vertex_count + edge_count) {
+      inner_cells_and.push_back(cell);
+    }
+  }
+
+  // Remove duplicates
+  std::sort(inner_cells_and.begin(), inner_cells_and.end());
+  inner_cells_and.erase(std::unique(inner_cells_and.begin(), inner_cells_and.end()), inner_cells_and.end());
+
+  return inner_cells_and;
 }
 
 std::vector<std::array<int, 3>> getBoundaryBetween(double radius1, double radius2)

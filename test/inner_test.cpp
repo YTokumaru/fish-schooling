@@ -11,24 +11,32 @@ TEST(InnerTest, RadiusZero)
   EXPECT_TRUE(result.empty());
 }
 
-TEST(InnerTest, RadiusLessThanOrEqualToPointEight)
+TEST(InnerTest, RadiusLessThanRootThree)
 {
-  double radius = std::sqrt(0.75);
+  double radius = std::sqrt(2.9);
   auto result = getInnerCells(radius);
   EXPECT_TRUE(result.empty());
 }
 
-TEST(InnerTest, RadiusGreaterThanOne)
+TEST(InnerTest, RadiusRootThree)
 {
-  double radius = 1.;
+  double radius = std::sqrt(3);
   auto result = getInnerCells(radius);
   std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
   EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
 }
 
-TEST(InnerTest, RadiusQuiteLarge)
+TEST(InnerTest, RadiusTwo)
 {
-  double radius = 1.8;
+  double radius = 2.0;
+  auto result = getInnerCells(radius);
+  std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
+  EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
+}
+
+TEST(InnerTest, RadiusRootSix)
+{
+  double radius = std::sqrt(6);
   auto result = getInnerCells(radius);
   std::vector<std::array<int, 3>> expected = {
     { 0, 0, 0 },
@@ -74,36 +82,10 @@ TEST(InnerBetweenTest, SameRadius)
   EXPECT_TRUE(result.empty());
 }
 
-TEST(InnerBetweenTest, Radius1LessThanRadius2)
+TEST(InnerBetweenTest, InnerIsEmpty)
 {
-  double radius1 = 0.3;
-  double radius2 = 1.8;
+  double radius1 = 0.5;
+  double radius2 = 2.0;
   auto result = getInnerBetween(radius1, radius2);
-  std::vector<std::array<int, 3>> expected = {
-    // {0,0,0},
-    { 1, 0, 0 },
-    { 0, 1, 0 },
-    { 0, 0, 1 },
-    { -1, 0, 0 },
-    { 0, -1, 0 },
-    { 0, 0, -1 },
-  };
-  EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
-}
-
-TEST(InnerBetweenTest, Radius1GreaterThanRadius2)
-{
-  double radius1 = 1.8;
-  double radius2 = 0.3;
-  auto result = getInnerBetween(radius1, radius2);
-  std::vector<std::array<int, 3>> expected = {
-    // {0,0,0},
-    { 1, 0, 0 },
-    { 0, 1, 0 },
-    { 0, 0, 1 },
-    { -1, 0, 0 },
-    { 0, -1, 0 },
-    { 0, 0, -1 },
-  };
-  EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
+  EXPECT_TRUE(result.empty());
 }

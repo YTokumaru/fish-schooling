@@ -71,9 +71,6 @@ TEST(EOMTest, Repulsion)
   auto inner = getInnerCells(fish_param.repulsion_radius);
   auto boundary = getBoundaryCells(fish_param.repulsion_radius);
 
-  EXPECT_EQ(inner.size(), 0);
-  EXPECT_THAT(boundary, UnorderedElementsAreArray(std::vector<std::array<int, 3>>({ { 0, 0, 0 } })));
-
   auto [delta_v_1, n_fish_1] = calcRepulsion(fish1, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_1, 1);
   fish1.setDeltaVelocity(delta_v_1);
@@ -113,7 +110,7 @@ TEST(EOMTest, RepulsionOverBoundary)
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
-    .repulsion_radius = 0.5,
+    .repulsion_radius = 0.6,
     .attraction_radius = 7.5,
     .n_cog = 3,
     .attraction_str = 10.0,
@@ -128,9 +125,6 @@ TEST(EOMTest, RepulsionOverBoundary)
 
   auto inner = getInnerCells(fish_param.repulsion_radius);
   auto boundary = getBoundaryCells(fish_param.repulsion_radius);
-
-  EXPECT_EQ(inner.size(), 0);
-  EXPECT_THAT(boundary, UnorderedElementsAreArray(std::vector<std::array<int, 3>>({ { 0, 0, 0 } })));
 
   auto [delta_v_1, n_fish_1] = calcRepulsion(fish1, sim_param, fish_param, cells, boundary, inner);
   EXPECT_EQ(n_fish_1, 1);

@@ -2,6 +2,7 @@
 #define COORDINATE_HPP
 
 #include <array>
+#include <cassert>
 #include <cmath>
 #include <vector>
 
@@ -25,6 +26,14 @@ Vect3 operator*=(Vect3 &lhs, double scalar);
 Vect3 operator/=(Vect3 &lhs, double scalar);
 
 Vect3 periodic(const Vect3 &vect, unsigned int len);
+
+bool isCellOnBoundary(const std::array<int, 3> &cell, double radius, const Vect3 &center);
+
+bool isCellInside(const std::array<int, 3> &cell, double radius, const Vect3 &center);
+
+std::vector<std::array<int, 3>> getBoundaryCells(double radius, const Vect3 &center);
+
+std::vector<std::array<int, 3>> getInnerCells(double radius, const Vect3 &center);
 
 std::vector<std::array<int, 3>> getBoundaryCells(double radius);
 
