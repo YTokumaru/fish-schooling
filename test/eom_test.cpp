@@ -50,7 +50,11 @@ TEST(EOMTest, Repulsion)
   Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
   Fish fish2({ 0.5, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
 
-  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 2 };
+  SimParam sim_param{
+    .length = 32,
+    .n_fish = 2,
+    .max_steps = 100,
+  };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -104,7 +108,7 @@ TEST(EOMTest, RepulsionOverBoundary)
   Fish fish1({ 9.75, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
   Fish fish2({ 0.25, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
 
-  SimParam sim_param{ .length = 10, .max_steps = 100, .n_fish = 2 };
+  SimParam sim_param{ .length = 10, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -160,7 +164,7 @@ TEST(EOMTest, Attraction)
   Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
   Fish fish2({ 5.0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
 
-  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 2 };
+  SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -212,7 +216,7 @@ TEST(EOMTest, AttractionOverBoundary)
   Fish fish1({ 32 - 0.25, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
   Fish fish2({ 4.75, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
 
-  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 2 };
+  SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -259,7 +263,7 @@ TEST(EOMTest, NoOtherFishAttraction)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
 
-  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 1 };
+  SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
@@ -290,7 +294,7 @@ TEST(EOMTest, NoOtherFishRepulsion)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
 
-  SimParam sim_param{ .length = 32, .max_steps = 100, .n_fish = 1 };
+  SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
   FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
