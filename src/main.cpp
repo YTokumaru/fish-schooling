@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <omp.h>
 #include <random>
 #include <string>
 
@@ -68,7 +69,8 @@ int main()
       cells[x][y][z].push_back(&one_fish);
     }
 
-    // Loop over the fish and store the delta velocity
+// Loop over the fish and store the delta velocity
+#pragma omp parallel for
     for (auto &one_fish : fish) {
 
       // Calculate the self-propulsion
@@ -87,6 +89,7 @@ int main()
 
 
     // Update the fish positions and velocities
+#pragma omp parallel for
     for (auto &one_fish : fish) { one_fish.update(sim_param, fish_param); }
 
     if (time_step % sim_param.snapshot_interval == 0) {
