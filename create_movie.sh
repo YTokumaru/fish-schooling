@@ -30,6 +30,12 @@ default_speed=$(grep 'vel-standard' "$yamlfile" | awk -F': ' '{print $2}')
 # Length
 length=$(grep '^[ \t]*length' "$yamlfile" | awk -F': ' '{print $2}')
 
+# delta t
+delta_t=$(grep '^[ \t]*delta-t' "$yamlfile" | awk -F': ' '{print $2}')
+
+# Snapshot interval
+snapshot_interval=$(grep '^[ \t]*snapshot-interval' "$yamlfile" | awk -F': ' '{print $2}')
+
 # Number of parallel tasks
 N=32
 
@@ -80,7 +86,7 @@ lightness(vx, vy, vz) = logistic(vz / default_speed)
 splot "output.txt" \
     every ::block*blocksize::(block+1)*blocksize-1 \
     using 1:2:3:(hsv2rgb(hue(\$4, \$5, \$6), saturation(\$4, \$5, \$6), lightness(\$4, \$5, \$6))) \
-    title sprintf("t = %d", block) \
+    title sprintf("t = %.2f", block * $delta_t * $snapshot_interval) \
     with points pointtype 7 \
     lc rgb variable
 EOF
