@@ -70,7 +70,7 @@ int main()
     }
 
 // Loop over the fish and store the delta velocity
-#pragma omp parallel for
+#pragma omp parallel for default(shared)
     for (auto &one_fish : fish) {
 
       // Calculate the self-propulsion
@@ -89,7 +89,7 @@ int main()
 
 
     // Update the fish positions and velocities
-#pragma omp parallel for
+#pragma omp parallel for default(shared)
     for (auto &one_fish : fish) { one_fish.update(sim_param, fish_param); }
 
     if (time_step % sim_param.snapshot_interval == 0) {
