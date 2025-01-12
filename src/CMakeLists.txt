@@ -1,7 +1,7 @@
 add_executable(fish_school main.cpp)
 target_link_libraries(fish_school PRIVATE project_warnings)
 target_link_libraries(fish_school PRIVATE fish coordinate simulation io eom)
-target_link_libraries(fish_school PUBLIC yaml-cpp::yaml-cpp)
+target_link_libraries(fish_school PUBLIC yaml-cpp::yaml-cpp argparse)
 if(OpenMP_CXX_FOUND)
     target_link_libraries(fish_school PUBLIC OpenMP::OpenMP_CXX)
 endif()

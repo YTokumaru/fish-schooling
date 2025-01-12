@@ -3,6 +3,7 @@
 #include "fish.hpp"
 #include "io.hpp"
 #include "simulation.hpp"
+#include <argparse/argparse.hpp>
 #include <array>
 #include <cstdlib>
 #include <fstream>
@@ -12,10 +13,32 @@
 #include <string>
 
 
-int main()
+int main(int argc, char *argv[])
 {
+  // Parse the command line arguments
+  argparse::ArgumentParser program("fish-school");
+
+  program.add_argument("-c", "--config")
+    .help("Path to the configuration file")
+    .default_value(std::string("config.yaml"));
+
+  program.add_argument("-o", "--output").help("Path to the output file").default_value(std::string("output.txt"));
+
+  program.add_argument("-p", "--parallel")
+    .help("Number of threads to use")
+    .default_value(omp_get_max_threads())
+    .action([](const std::string &value) { return std::stoi(value); });
+
+  try {
+    program.parse_args(argc, argv);
+  } catch (const std::runtime_error &err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << program;
+    return 1;
+  }
+
   // Load the parameters from the YAML file
-  YAML::Node config = YAML::LoadFile("config.yaml");
+  YAML::Node config = YAML::LoadFile(program.get<std::string>("--config"));
 
   FishParam fish_param{};
   SimParam sim_param{};
@@ -29,7 +52,7 @@ int main()
     return 1;
   }
 
-  omp_set_num_threads(16);
+  omp_set_num_threads(program.get<int>("--parallel"));
 
   // Output file
   std::ofstream output_file("output.txt");
