@@ -98,7 +98,8 @@ int main()
       // Output the fish positions
       for (auto &one_fish : fish) {
         auto [x, y, z] = one_fish.getPosition();
-        output_file << x << " " << y << " " << z << '\n';
+        auto [vx, vy, vz] = one_fish.getVelocity();
+        output_file << x << " " << y << " " << z << " " << vx << " " << vy << " " << vz << '\n';
       }
     }
   }
