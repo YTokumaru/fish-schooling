@@ -29,6 +29,8 @@ int main()
     return 1;
   }
 
+  omp_set_num_threads(16);
+
   // Output file
   std::ofstream output_file("output.txt");
 
