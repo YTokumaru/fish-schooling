@@ -106,10 +106,14 @@ int main(int argc, char *argv[])
 
       if (n_fish_repulsion <= fish_param.n_cog) { one_fish.setLambda(fish_param.attraction_str); }
 
-      auto [delta_v_attraction, n_fish_attrac] =
-        calcAttraction(one_fish, sim_param, fish_param, cells, attractive_boundary, attractive_inner);
+      if (one_fish.getLambda() > 0) {
+        auto [delta_v_attraction, n_fish_attrac] =
+          calcAttraction(one_fish, sim_param, fish_param, cells, attractive_boundary, attractive_inner);
 
-      one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion + delta_v_attraction);
+        one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion + delta_v_attraction);
+      } else {
+        one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion);
+      }
     }
 
 
