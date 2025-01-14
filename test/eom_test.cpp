@@ -40,6 +40,10 @@ TEST(EOMTest, SelfPropulsion)
   EXPECT_DOUBLE_EQ(delta_v.x, (1 / sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7) - 1.0) * 0.5);
   EXPECT_DOUBLE_EQ(delta_v.y, (1 / sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7) - 1.0) * 0.6);
   EXPECT_DOUBLE_EQ(delta_v.z, (1 / sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7) - 1.0) * 0.7);
+
+  EXPECT_FALSE(std::isnan(delta_v.x));
+  EXPECT_FALSE(std::isnan(delta_v.y));
+  EXPECT_FALSE(std::isnan(delta_v.z));
 }
 
 TEST(EOMTest, Repulsion)
@@ -62,7 +66,7 @@ TEST(EOMTest, Repulsion)
     .body_length = 1.0,
     .repulsion_radius = 0.5,
     .attraction_radius = 7.5,
-    .n_cog = 3,
+    .n_cog = 1,
     .attraction_str = 10.0,
     .attraction_duration = 0.1 };
 
@@ -98,6 +102,10 @@ TEST(EOMTest, Repulsion)
   EXPECT_DOUBLE_EQ(delta_v_1.y, delta_v_2.y);
   EXPECT_DOUBLE_EQ(delta_v_1.z, 0);
   EXPECT_DOUBLE_EQ(delta_v_2.z, 0);
+
+  EXPECT_TRUE(std::isfinite(delta_v_1.x));
+  EXPECT_TRUE(std::isfinite(delta_v_1.y));
+  EXPECT_TRUE(std::isfinite(delta_v_1.z));
 }
 
 TEST(EOMTest, RepulsionOverBoundary)
@@ -153,6 +161,10 @@ TEST(EOMTest, RepulsionOverBoundary)
   EXPECT_DOUBLE_EQ(delta_v_1.y, delta_v_2.y);
   EXPECT_DOUBLE_EQ(delta_v_1.z, 0);
   EXPECT_DOUBLE_EQ(delta_v_2.z, 0);
+
+  EXPECT_TRUE(std::isfinite(delta_v_1.x));
+  EXPECT_TRUE(std::isfinite(delta_v_1.y));
+  EXPECT_TRUE(std::isfinite(delta_v_1.z));
 }
 
 TEST(EOMTest, Attraction)
@@ -205,6 +217,10 @@ TEST(EOMTest, Attraction)
   EXPECT_DOUBLE_EQ(delta_v_1.y, delta_v_2.y);
   EXPECT_DOUBLE_EQ(delta_v_1.z, 0);
   EXPECT_DOUBLE_EQ(delta_v_2.z, 0);
+
+  EXPECT_TRUE(std::isfinite(delta_v_1.x));
+  EXPECT_TRUE(std::isfinite(delta_v_1.y));
+  EXPECT_TRUE(std::isfinite(delta_v_1.z));
 }
 
 TEST(EOMTest, AttractionOverBoundary)
@@ -257,6 +273,10 @@ TEST(EOMTest, AttractionOverBoundary)
   EXPECT_DOUBLE_EQ(delta_v_1.y, delta_v_2.y);
   EXPECT_DOUBLE_EQ(delta_v_1.z, 0);
   EXPECT_DOUBLE_EQ(delta_v_2.z, 0);
+
+  EXPECT_TRUE(std::isfinite(delta_v_1.x));
+  EXPECT_TRUE(std::isfinite(delta_v_1.y));
+  EXPECT_TRUE(std::isfinite(delta_v_1.z));
 }
 
 TEST(EOMTest, NoOtherFishAttraction)
@@ -288,6 +308,10 @@ TEST(EOMTest, NoOtherFishAttraction)
   EXPECT_DOUBLE_EQ(delta_v.x, 0);
   EXPECT_DOUBLE_EQ(delta_v.y, 0);
   EXPECT_DOUBLE_EQ(delta_v.z, 0);
+
+  EXPECT_TRUE(std::isfinite(delta_v.x));
+  EXPECT_TRUE(std::isfinite(delta_v.y));
+  EXPECT_TRUE(std::isfinite(delta_v.z));
 }
 
 TEST(EOMTest, NoOtherFishRepulsion)
@@ -319,4 +343,8 @@ TEST(EOMTest, NoOtherFishRepulsion)
   EXPECT_DOUBLE_EQ(delta_v.x, 0);
   EXPECT_DOUBLE_EQ(delta_v.y, 0);
   EXPECT_DOUBLE_EQ(delta_v.z, 0);
+
+  EXPECT_TRUE(std::isfinite(delta_v.x));
+  EXPECT_TRUE(std::isfinite(delta_v.y));
+  EXPECT_TRUE(std::isfinite(delta_v.z));
 }

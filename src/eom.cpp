@@ -63,39 +63,8 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
   auto center_y = static_cast<unsigned long>(fish_y);
   auto center_z = static_cast<unsigned long>(fish_z);
 
-  // Loop through the neighboring boundary cells
-  for (const auto &boundary_cell_relpos : repulsion_boundary) {
-    int loop_x = static_cast<int>(center_x) + boundary_cell_relpos[0];
-    int loop_y = static_cast<int>(center_y) + boundary_cell_relpos[1];
-    int loop_z = static_cast<int>(center_z) + boundary_cell_relpos[2];
-    // Account for the periodic boundary conditions
-    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
-    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
-    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
-
-    assert(loop_x >= 0);
-    assert(loop_y >= 0);
-    assert(loop_z >= 0);
-
-
-    // Loop through the fish in the neighboring cell
-    for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
-      // Skip the fish itself
-      if (neighbour_fish_ptr == &fish) { continue; }
-
-      // Check if the fish is within the repulsion radius
-      if (abs(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
-          > fish_param.repulsion_radius) {
-        continue;
-      }
-
-      delta_v_repulsion += calcDeltaVRepulsion(fish, *neighbour_fish_ptr, sim_param, fish_param);
-
-      neighbour_count++;
-    }
-  }
-
-  // Loop through the neighboring inner cells
+  // Create and sort the fish in the inner cells
+  std::vector<Fish *> inner_fish_ptr{};
   for (const auto &inner_cell_relpos : repulsion_inner) {
     int loop_x = static_cast<int>(center_x) + inner_cell_relpos[0];
     int loop_y = static_cast<int>(center_y) + inner_cell_relpos[1];
@@ -110,16 +79,73 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
     assert(loop_y >= 0);
     assert(loop_z >= 0);
 
+    for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
+      // Skip the fish itself
+      if (neighbour_fish_ptr == &fish) { continue; }
+
+      inner_fish_ptr.push_back(neighbour_fish_ptr);
+    }
+  }
+
+  // Sort the fish in the inner cells based on the distance to the fish
+  std::sort(inner_fish_ptr.begin(), inner_fish_ptr.end(), [&fish, &sim_param](Fish *a, Fish *b) {
+    return abs(vect12(fish.getPosition(), a->getPosition(), sim_param.length))
+           < abs(vect12(fish.getPosition(), b->getPosition(), sim_param.length));
+  });
+
+
+  // Calculate the repulsion with up to n_cog nearest fish
+  for (unsigned long i = 0; i < std::min(static_cast<unsigned long>(fish_param.n_cog), inner_fish_ptr.size()); i++) {
+    delta_v_repulsion += calcDeltaVRepulsion(fish, *inner_fish_ptr[i], sim_param, fish_param);
+    neighbour_count++;
+  }
+
+  // If already enough fish are found, return the result
+  if (neighbour_count >= fish_param.n_cog) { return { delta_v_repulsion / neighbour_count, neighbour_count }; }
+
+
+  // Pointer to the fish in the repulsion boundary cells
+  std::vector<Fish *> boundary_fish_ptr{};
+  for (const auto &boundary_cell_relpos : repulsion_boundary) {
+    int loop_x = static_cast<int>(center_x) + boundary_cell_relpos[0];
+    int loop_y = static_cast<int>(center_y) + boundary_cell_relpos[1];
+    int loop_z = static_cast<int>(center_z) + boundary_cell_relpos[2];
+    // Account for the periodic boundary conditions
+    loop_x = (loop_x + static_cast<int>(cells.size())) % static_cast<int>(cells.size());
+    loop_y = (loop_y + static_cast<int>(cells[0].size())) % static_cast<int>(cells[0].size());
+    loop_z = (loop_z + static_cast<int>(cells[0][0].size())) % static_cast<int>(cells[0][0].size());
+
+    assert(loop_x >= 0);
+    assert(loop_y >= 0);
+    assert(loop_z >= 0);
 
     // Loop through the fish in the neighboring cell
     for (auto *neighbour_fish_ptr : cells[loop_x][loop_y][loop_z]) {
       // Skip the fish itself
       if (neighbour_fish_ptr == &fish) { continue; }
 
-      delta_v_repulsion += calcDeltaVRepulsion(fish, *neighbour_fish_ptr, sim_param, fish_param);
-
-      neighbour_count++;
+      // Check if the fish is within the repulsion radius
+      if (abs(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
+          > fish_param.repulsion_radius) {
+        continue;
+      }
+      boundary_fish_ptr.push_back(neighbour_fish_ptr);
     }
+  }
+
+  // Sort the fish in the boundary cells based on the distance to the fish
+  std::sort(boundary_fish_ptr.begin(), boundary_fish_ptr.end(), [&fish, &sim_param](Fish *a, Fish *b) {
+    return abs(vect12(fish.getPosition(), a->getPosition(), sim_param.length))
+           < abs(vect12(fish.getPosition(), b->getPosition(), sim_param.length));
+  });
+
+  // Calculate the repulsion with up to n_cog - neighbour_count nearest fish
+  unsigned long inner_fish_size = neighbour_count;
+  for (unsigned long i = 0;
+       i < std::min(static_cast<unsigned long>(fish_param.n_cog - inner_fish_size), boundary_fish_ptr.size());
+       i++) {
+    delta_v_repulsion += calcDeltaVRepulsion(fish, *boundary_fish_ptr[i], sim_param, fish_param);
+    neighbour_count++;
   }
 
   return { neighbour_count != 0 ? delta_v_repulsion / neighbour_count : Vect3{ 0.0, 0.0, 0.0 }, neighbour_count };

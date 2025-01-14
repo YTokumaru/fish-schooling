@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
       auto [delta_v_repulsion, n_fish_repulsion] =
         calcRepulsion(one_fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner);
 
-      if (n_fish_repulsion <= fish_param.n_cog) { one_fish.setLambda(fish_param.attraction_str); }
+      if (n_fish_repulsion < fish_param.n_cog) { one_fish.setLambda(fish_param.attraction_str); }
 
       if (one_fish.getLambda() > 0) {
         auto [delta_v_attraction, n_fish_attrac] =

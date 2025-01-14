@@ -4,9 +4,11 @@
 #include "coordinate.hpp"
 #include "fish.hpp"
 #include "simulation.hpp"
+#include <algorithm>
 #include <cassert>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 double g(double distance, double body_length);
 
