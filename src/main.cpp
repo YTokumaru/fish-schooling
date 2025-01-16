@@ -16,18 +16,11 @@
 int main(int argc, char *argv[])
 {
   // Parse the command line arguments
-  argparse::ArgumentParser program("fish-school");
+  argparse::ArgumentParser program("fish_school");
 
-  program.add_argument("-c", "--config")
-    .help("Path to the configuration file")
-    .default_value(std::string("config.yaml"));
+  program.add_argument("-c", "--config").required().help("Path to the configuration file");
 
   program.add_argument("-o", "--output").help("Path to the output file").default_value(std::string("output.txt"));
-
-  program.add_argument("-p", "--parallel")
-    .help("Number of threads to use")
-    .default_value(omp_get_max_threads())
-    .action([](const std::string &value) { return std::stoi(value); });
 
   try {
     program.parse_args(argc, argv);
