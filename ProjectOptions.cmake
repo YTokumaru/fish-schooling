@@ -8,7 +8,7 @@ macro(project_setup_options)
         option(PROJECT_ENABLE_CLANG_TIDY "Enable clang-tidy checks" ON)
         option(PROJECT_ENABLE_CPPCHECK "Enable cppcheck checks" ON)
         option(PROJECT_ENABLE_WARNINGS "Enable compiler warnings" ON)
-        option(PROJECT_ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+        option(PROJECT_ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" ON)
         option(PROJECT_BUILD_TESTS "Build tests" ON)
         option(PROJECT_COMPILER_WARNINGS "Enable compiler warnings" ON)
     endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -38,19 +38,19 @@ macro(project_setup_options)
     endif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     
     
-    add_library(project_warnings INTERFACE)
+    add_library(project_options INTERFACE)
 
 
     # Set the options
     include(cmake/StaticAnalyzers.cmake)
     if(PROJECT_ENABLE_CPPCHECK)
         message(STATUS "Enabling cppcheck")
-        project_enable_cppcheck(${PROJECT_ENABLE_WARNINGS_AS_ERRORS} "")
+        project_enable_cppcheck(project_options ${PROJECT_ENABLE_WARNINGS_AS_ERRORS})
     endif(PROJECT_ENABLE_CPPCHECK)
 
     if(PROJECT_ENABLE_CLANG_TIDY)
         message(STATUS "Enabling clang-tidy")
-        project_enable_clang_tidy(${PROJECT_ENABLE_WARNINGS_AS_ERRORS})
+        project_enable_clang_tidy(project_options ${PROJECT_ENABLE_WARNINGS_AS_ERRORS})
     endif(PROJECT_ENABLE_CLANG_TIDY)
     
     if(PROJECT_BUILD_TESTS)
