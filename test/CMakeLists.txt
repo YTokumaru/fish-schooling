@@ -29,7 +29,16 @@ target_link_libraries(vector_test GTest::gtest_main GTest::gmock_main)
 # Set the clang-tidy checks
 set(TEST_TARGETS boundary_test inner_test fish_test io_test eom_test vector_test)
 get_target_property(OPTION_TIDY project_options CXX_CLANG_TIDY)
-set_target_properties(${TEST_TARGETS} PROPERTIES CXX_CLANG_TIDY "${OPTION_TIDY}")
+if(OPTION_TIDY)
+    set_target_properties(${TEST_TARGETS} PROPERTIES CXX_CLANG_TIDY "${OPTION_TIDY}")
+endif(OPTION_TIDY)
+
+
+# Set the cppcheck checks
+get_target_property(OPTION_CPPCHECK project_options CXX_CPPCHECK)
+if(OPTION_CPPCHECK)
+    set_target_properties(${TEST_TARGETS} PROPERTIES CXX_CPPCHECK "${OPTION_CPPCHECK}")
+endif(OPTION_CPPCHECK)
 
 foreach(test ${TEST_TARGETS})
     gtest_discover_tests(${test})

@@ -1,6 +1,6 @@
 include(cmake/Utility.cmake)
 
-macro(project_enable_cppcheck WARNINGS_AS_ERRORS)
+macro(project_enable_cppcheck TARGET WARNINGS_AS_ERRORS)
   find_program(CPPCHECK cppcheck)
   if(CPPCHECK)
     get_binary_version(CPPCHECK_VERSION ${CPPCHECK})
@@ -12,7 +12,7 @@ macro(project_enable_cppcheck WARNINGS_AS_ERRORS)
 
     # Enable all warnings that are actionable by the user of this toolset
     # style should enable the other 3, but we'll be explicit just in case
-    set(CMAKE_CXX_CPPCHECK
+    set(OPTION_CXX_CPPCHECK
         ${CPPCHECK}
         --template=${CPPCHECK_TEMPLATE}
         --enable=style,performance,warning,portability
@@ -33,14 +33,14 @@ macro(project_enable_cppcheck WARNINGS_AS_ERRORS)
        "${CMAKE_CXX_STANDARD}"
        STREQUAL
        "")
-      set(CMAKE_CXX_CPPCHECK ${CMAKE_CXX_CPPCHECK} --std=c++${CMAKE_CXX_STANDARD})
+      set(OPTION_CXX_CPPCHECK ${OPTION_CXX_CPPCHECK} --std=c++${CMAKE_CXX_STANDARD})
     endif()
     if(${WARNINGS_AS_ERRORS})
-      list(APPEND CMAKE_CXX_CPPCHECK --error-exitcode=2)
+      list(APPEND OPTION_CXX_CPPCHECK --error-exitcode=2)
     endif()
     message(STATUS "${CPPCHECK} ${CPPCHECK_VERSION}: found")
-    message(STATUS "Enabling cppcheck with options: ${CMAKE_CXX_CPPCHECK}")
-    set_target_properties(${TARGET} PROPERTIES CXX_CPPCHECK "${CMAKE_CXX_CPPCHECK}")
+    message(STATUS "Enabling cppcheck with options: ${OPTION_CXX_CPPCHECK}")
+    set_target_properties(${TARGET} PROPERTIES CXX_CPPCHECK "${OPTION_CXX_CPPCHECK}")
   else()
     message(WARNING "cppcheck requested but executable not found")
   endif()

@@ -20,6 +20,8 @@ FetchContent_Declare(
   GIT_TAG yaml-cpp-0.7.0 # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
 )
 FetchContent_MakeAvailable(yaml-cpp)
+get_target_property(YAML_CPP_INCLUDE_DIR yaml-cpp INTERFACE_INCLUDE_DIRECTORIES)
+set_target_properties(yaml-cpp PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${YAML_CPP_INCLUDE_DIR}")
 
 find_package(OpenMP REQUIRED)
 if (OPENMP_FOUND)
@@ -36,6 +38,8 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
 )
 FetchContent_MakeAvailable(argparse)
+get_target_property(ARGPARSE_INCLUDE_DIR argparse INTERFACE_INCLUDE_DIRECTORIES)
+set_target_properties(argparse PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${ARGPARSE_INCLUDE_DIR}")
 
 include(ProjectOptions.cmake)
 project_setup_options()
