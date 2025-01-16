@@ -1,6 +1,6 @@
-#include "yaml-cpp/yaml.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <yaml-cpp/yaml.h>
 
 #include "io.hpp"
 #include <fstream>

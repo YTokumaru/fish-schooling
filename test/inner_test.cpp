@@ -13,14 +13,14 @@ TEST(InnerTest, RadiusZero)
 
 TEST(InnerTest, RadiusLessThanRootThree)
 {
-  double radius = std::sqrt(2.9);
+  const double radius = std::sqrt(2.9);
   auto result = getInnerCells(radius);
   EXPECT_TRUE(result.empty());
 }
 
 TEST(InnerTest, RadiusRootThree)
 {
-  double radius = std::sqrt(3);
+  const double radius = std::sqrt(3);
   auto result = getInnerCells(radius);
   std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
   EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
@@ -28,7 +28,7 @@ TEST(InnerTest, RadiusRootThree)
 
 TEST(InnerTest, RadiusTwo)
 {
-  double radius = 2.0;
+  const double radius = 2.0;
   auto result = getInnerCells(radius);
   std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
   EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
@@ -36,7 +36,7 @@ TEST(InnerTest, RadiusTwo)
 
 TEST(InnerTest, RadiusRootSix)
 {
-  double radius = std::sqrt(6);
+  const double radius = std::sqrt(6);
   auto result = getInnerCells(radius);
   std::vector<std::array<int, 3>> expected = {
     { 0, 0, 0 },
@@ -52,16 +52,16 @@ TEST(InnerTest, RadiusRootSix)
 
 TEST(InnerBetweenTest, RadiusZero)
 {
-  double radius1 = 0.0;
-  double radius2 = 0.0;
+  const double radius1 = 0.0;
+  const double radius2 = 0.0;
   auto result = getInnerBetween(radius1, radius2);
   EXPECT_TRUE(result.empty());
 }
 
 TEST(InnerBetweenTest, OneRadiusZero)
 {
-  double radius1 = 0.0;
-  double radius2 = 5.0;
+  const double radius1 = 0.0;
+  const double radius2 = 5.0;
   auto result = getInnerBetween(radius1, radius2);
   auto expected = getInnerCells(radius2);
   EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
@@ -69,23 +69,23 @@ TEST(InnerBetweenTest, OneRadiusZero)
 
 TEST(InnerBetweenTest, RadiusLessThanOrEqualToPointEight)
 {
-  double radius1 = std::sqrt(0.75);
-  double radius2 = std::sqrt(0.75);
+  const double radius1 = std::sqrt(0.75);
+  const double radius2 = std::sqrt(0.75);
   auto result = getInnerBetween(radius1, radius2);
   EXPECT_TRUE(result.empty());
 }
 
 TEST(InnerBetweenTest, SameRadius)
 {
-  double radius = 2.5;
+  const double radius = 2.5;
   auto result = getInnerBetween(radius, radius);
   EXPECT_TRUE(result.empty());
 }
 
 TEST(InnerBetweenTest, InnerIsEmpty)
 {
-  double radius1 = 0.5;
-  double radius2 = 2.0;
+  const double radius1 = 0.5;
+  const double radius2 = 2.0;
   auto result = getInnerBetween(radius1, radius2);
   EXPECT_TRUE(result.empty());
 }

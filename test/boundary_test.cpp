@@ -13,7 +13,7 @@ TEST(BoundaryTest, RadiusZero)
 
 TEST(BoundaryTest, RadiusEqualToPointFive)
 {
-  double radius = 0.5;
+  const double radius = 0.5;
   auto result = getBoundaryCells(radius);
   ASSERT_EQ(result.size(), 27);
   ASSERT_THAT(result,
@@ -48,7 +48,7 @@ TEST(BoundaryTest, RadiusEqualToPointFive)
 
 TEST(BoundaryTest, RadiusPointZeroSevenFive)
 {
-  double radius = 0.75;
+  const double radius = 0.75;
   auto result = getBoundaryCells(radius);
   ASSERT_EQ(result.size(), 27);
   std::vector<std::array<int, 3>> expected = { { 0, 0, 0 },
@@ -84,7 +84,7 @@ TEST(BoundaryTest, RadiusPointZeroSevenFive)
 
 TEST(BoundaryTest, RadiusTwo)
 {
-  double radius = 2.0;
+  const double radius = 2.0;
   auto result = getBoundaryCells(radius);
   std::vector<std::array<int, 3>> expected = { { 0, 0, 1 },
     { 0, 1, 0 },
@@ -216,16 +216,16 @@ TEST(BoundaryTest, RadiusTwo)
 
 TEST(BoundaryBetweenTest, RadiusZero)
 {
-  double radius1 = 0.0;
-  double radius2 = 0.0;
+  const double radius1 = 0.0;
+  const double radius2 = 0.0;
   auto result = getBoundaryBetween(radius1, radius2);
   EXPECT_TRUE(result.empty());
 }
 
 TEST(BoundaryBetweenTest, RadiusLessThanOrEqualToPointFive)
 {
-  double radius1 = 0.5;
-  double radius2 = 0.5;
+  const double radius1 = 0.5;
+  const double radius2 = 0.5;
   auto result = getBoundaryBetween(radius1, radius2);
   std::vector<std::array<int, 3>> expected = { { 0, 0, 0 },
     { 1, 0, 0 },
@@ -259,7 +259,7 @@ TEST(BoundaryBetweenTest, RadiusLessThanOrEqualToPointFive)
 
 TEST(BoundaryBetweenTest, SameRadius)
 {
-  double radius = 2.5;
+  const double radius = 2.5;
   auto result = getBoundaryBetween(radius, radius);
 
   auto other_result = getBoundaryCells(radius);
@@ -269,9 +269,11 @@ TEST(BoundaryBetweenTest, SameRadius)
 
 TEST(BoundaryBetweenTest, RadiusFlipped)
 {
-  double radius1 = 4.5;
-  double radius2 = 1.5;
+  const double radius1 = 4.5;
+  const double radius2 = 1.5;
   auto result1 = getBoundaryBetween(radius1, radius2);
+
+  // NOLINTNEXTLINE(readability-suspicious-call-argument)
   auto result2 = getBoundaryBetween(radius2, radius1);
 
   EXPECT_THAT(result1, UnorderedElementsAreArray(result2));

@@ -25,7 +25,7 @@ target_include_directories(eom PUBLIC "${PROJECT_SOURCE_DIR}/include")
 add_library(io io.cpp)
 target_include_directories(io PUBLIC "${PROJECT_SOURCE_DIR}/include")
 target_link_libraries(io PRIVATE simulation project_options)
-target_link_libraries(io PUBLIC yaml-cpp::yaml-cpp)
+target_link_libraries(io PUBLIC yaml-cpp::yaml-cpp argparse)
 
 # Set the clang-tidy checks
 set(SRC_TARGETS fish_school coordinate simulation fish eom io)

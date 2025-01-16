@@ -2,6 +2,7 @@
 #define IO_HPP
 
 #include "simulation.hpp"
+#include <argparse/argparse.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -15,5 +16,7 @@
 int operator>>(const YAML::Node &node, SimParam &param);
 
 int operator>>(const YAML::Node &node, FishParam &param);
+
+int parseArguments(int argc, char **argv, argparse::ArgumentParser &program);
 
 #endif// IO_HPP

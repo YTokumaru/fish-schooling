@@ -23,8 +23,9 @@ TEST(EOMTest, GFactor)
 
 TEST(EOMTest, SelfPropulsion)
 {
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish({ 0, 0, 0 }, { 0.5, 0.6, 0.7 }, { 0, 0, 0 }, 0);
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -50,17 +51,21 @@ TEST(EOMTest, Repulsion)
 {
   // Place two fish in the vicinity of each other and check the distance
   // Note that the distance between the two is less than the repulsion radius
-  // Also note that the movement of the fish is confined to the xy plane
+  // is confined to the xy plane
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish2({ 0.5, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
 
-  SimParam sim_param{
+  const SimParam sim_param{
     .length = 32,
     .n_fish = 2,
     .max_steps = 100,
+    .delta_t = 0.1,
+    .snapshot_interval = 10,
   };
 
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -71,8 +76,9 @@ TEST(EOMTest, Repulsion)
     .attraction_duration = 0.1 };
 
   // Create dummy cells
-  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(
-    32, std::vector<std::vector<std::vector<Fish *>>>(32, std::vector<std::vector<Fish *>>(32)));
+  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
+    std::vector<std::vector<std::vector<Fish *>>>(
+      sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
   cells[0][0][0].push_back(&fish1);
   cells[0][0][0].push_back(&fish2);
 
@@ -113,12 +119,14 @@ TEST(EOMTest, RepulsionOverBoundary)
   // Place two fish in the vicinity of each other and check the distance
   // Note that the distance between the two is less than the repulsion radius
   // Also note that the movement of the fish is confined to the xy plane
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish1({ 9.75, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish2({ 0.25, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
 
-  SimParam sim_param{ .length = 10, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
+  const SimParam sim_param{ .length = 10, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -132,7 +140,7 @@ TEST(EOMTest, RepulsionOverBoundary)
   std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
     std::vector<std::vector<std::vector<Fish *>>>(
       sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
-  cells[9][0][0].push_back(&fish1);
+  cells[static_cast<unsigned long>(fish1.getPosition().x)][0][0].push_back(&fish1);
   cells[0][0][0].push_back(&fish2);
 
   auto inner = getInnerCells(fish_param.repulsion_radius);
@@ -173,12 +181,14 @@ TEST(EOMTest, Attraction)
   // Note that the distance between the two is more than the repulsion radius and less than the attraction radius
   // Also note that the movement of the fish is confined to the xy plane
   // Make sure to set lambda to a positive value
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish2({ 5.0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
 
-  SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
+  const SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -189,10 +199,11 @@ TEST(EOMTest, Attraction)
     .attraction_duration = 0.1 };
 
   // Create dummy cells
-  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(
-    32, std::vector<std::vector<std::vector<Fish *>>>(32, std::vector<std::vector<Fish *>>(32)));
+  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
+    std::vector<std::vector<std::vector<Fish *>>>(
+      sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
   cells[0][0][0].push_back(&fish1);
-  cells[5][0][0].push_back(&fish2);
+  cells[static_cast<unsigned long>(fish2.getPosition().x)][0][0].push_back(&fish2);
 
   auto inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
   auto boundary = getBoundaryBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
@@ -229,12 +240,14 @@ TEST(EOMTest, AttractionOverBoundary)
   // Note that the distance between the two is more than the repulsion radius and less than the attraction radius
   // Also note that the movement of the fish is confined to the xy plane
   // Make sure to set lambda to a positive value
+  //// NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish1({ 32 - 0.25, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  //// NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
   Fish fish2({ 4.75, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
 
-  SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
+  const SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -245,10 +258,11 @@ TEST(EOMTest, AttractionOverBoundary)
     .attraction_duration = 0.1 };
 
   // Create dummy cells
-  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(
-    32, std::vector<std::vector<std::vector<Fish *>>>(32, std::vector<std::vector<Fish *>>(32)));
-  cells[31][0][0].push_back(&fish1);
-  cells[4][0][0].push_back(&fish2);
+  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
+    std::vector<std::vector<std::vector<Fish *>>>(
+      sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
+  cells[static_cast<unsigned long>(fish1.getPosition().x)][0][0].push_back(&fish1);
+  cells[static_cast<unsigned long>(fish2.getPosition().x)][0][0].push_back(&fish2);
 
   auto inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
   auto boundary = getBoundaryBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
@@ -283,9 +297,9 @@ TEST(EOMTest, NoOtherFishAttraction)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
 
-  SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
+  const SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -296,8 +310,9 @@ TEST(EOMTest, NoOtherFishAttraction)
     .attraction_duration = 0.1 };
 
   // Create dummy cells
-  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(
-    32, std::vector<std::vector<std::vector<Fish *>>>(32, std::vector<std::vector<Fish *>>(32)));
+  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
+    std::vector<std::vector<std::vector<Fish *>>>(
+      sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
   cells[0][0][0].push_back(&fish);
 
   auto inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
@@ -318,9 +333,9 @@ TEST(EOMTest, NoOtherFishRepulsion)
 {
   Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
 
-  SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
+  const SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
-  FishParam fish_param{ .vel_standard = 1.0,
+  const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
     .body_length = 1.0,
@@ -331,8 +346,9 @@ TEST(EOMTest, NoOtherFishRepulsion)
     .attraction_duration = 0.1 };
 
   // Create dummy cells
-  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(
-    32, std::vector<std::vector<std::vector<Fish *>>>(32, std::vector<std::vector<Fish *>>(32)));
+  std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
+    std::vector<std::vector<std::vector<Fish *>>>(
+      sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
   cells[0][0][0].push_back(&fish);
 
   auto inner = getInnerCells(fish_param.repulsion_radius);

@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <tuple>
 #include <vector>
 
 struct Vect3
@@ -45,8 +46,6 @@ std::vector<std::array<int, 3>> getInnerBetween(double radius1, double radius2);
 
 double abs(const Vect3 &vect);
 Vect3 normalize(const Vect3 &vect);
-
-Vect3 vect12(const Vect3 &vect1, const Vect3 &vect2);
 
 Vect3 vect12(const Vect3 &vect1, Vect3 vect2, unsigned int len);
 

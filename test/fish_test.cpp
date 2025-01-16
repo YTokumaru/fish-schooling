@@ -67,7 +67,7 @@ TEST(FishTest, Speed)
 TEST(FishTest, Update)
 {
   Fish fish({ 0, 0, 0 }, { 1, 1, 1 }, { 0.1, 0.1, 0.1 }, 15.0);
-  SimParam sim_param{ 100, 1000, 1000, 0.01 };
+  SimParam sim_param{ 100, 1000, 1000, 0.01, 100 };
   FishParam fish_param{ 1.5, 1.5, 7.5, 1.0, 1.0, 7.5, 3, 15.0, 1.0 };
   fish.update(sim_param, fish_param);
   ASSERT_NEAR(fish.getPosition().x, (1.0 + 0.1 * 0.01) * 0.01, 1e-6);

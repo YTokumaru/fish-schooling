@@ -18,17 +18,11 @@ int main(int argc, char *argv[])
   // Parse the command line arguments
   argparse::ArgumentParser program("fish_school");
 
-  program.add_argument("-c", "--config").required().help("Path to the configuration file");
-
-  program.add_argument("-o", "--output").help("Path to the output file").default_value(std::string("output.txt"));
-
-  try {
-    program.parse_args(argc, argv);
-  } catch (const std::runtime_error &err) {
-    std::cerr << err.what() << std::endl;
-    std::cerr << program;
+  if (parseArguments(argc, argv, program) == EXIT_FAILURE) {
+    std::cout << program;
     return 1;
   }
+
 
   // Load the parameters from the YAML file
   YAML::Node config = YAML::LoadFile(program.get<std::string>("--config"));
@@ -44,8 +38,6 @@ int main(int argc, char *argv[])
     std::cerr << "Error reading simulation parameters" << std::endl;
     return 1;
   }
-
-  omp_set_num_threads(program.get<int>("--parallel"));
 
   // Output file
   std::ofstream output_file("output.txt");
@@ -88,7 +80,9 @@ int main(int argc, char *argv[])
     }
 
 // Loop over the fish and store the delta velocity
-#pragma omp parallel for default(shared)
+#pragma omp parallel for default(none), \
+  shared(                               \
+    fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner, attractive_boundary, attractive_inner)
     for (auto &one_fish : fish) {
 
       // Calculate the self-propulsion
@@ -111,7 +105,7 @@ int main(int argc, char *argv[])
 
 
     // Update the fish positions and velocities
-#pragma omp parallel for default(shared)
+#pragma omp parallel for default(none), shared(fish, sim_param, fish_param)
     for (auto &one_fish : fish) { one_fish.update(sim_param, fish_param); }
 
     if (time_step % sim_param.snapshot_interval == 0) {

@@ -1,5 +1,4 @@
 #include "coordinate.hpp"
-#include <vector>
 
 Vect3 operator+(const Vect3 &lhs, const Vect3 &rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z }; }
 
@@ -94,11 +93,11 @@ Vect3 vect12(const Vect3 &vect1, Vect3 vect2, unsigned int len)
 unsigned int countInside(const std::array<int, 3> &cell, double radius, const Vect3 &center, bool count_boundary)
 {
 
-  const std::array<Vect3, 6> faces_relpos = {
+  constexpr std::array<Vect3, 6> faces_relpos = {
     { { 0.5, 0, 0 }, { -0.5, 0, 0 }, { 0, 0.5, 0 }, { 0, -0.5, 0 }, { 0, 0, 0.5 }, { 0, 0, -0.5 } }
   };
 
-  const std::array<Vect3, 8> vertices_relpos = { { { 0.5, 0.5, 0.5 },
+  constexpr std::array<Vect3, 8> vertices_relpos = { { { 0.5, 0.5, 0.5 },
     { 0.5, 0.5, -0.5 },
     { 0.5, -0.5, 0.5 },
     { 0.5, -0.5, -0.5 },
@@ -107,7 +106,7 @@ unsigned int countInside(const std::array<int, 3> &cell, double radius, const Ve
     { -0.5, -0.5, 0.5 },
     { -0.5, -0.5, -0.5 } } };
 
-  const std::array<Vect3, 12> edges_relpos = { { { 0.5, 0.5, 0 },
+  constexpr std::array<Vect3, 12> edges_relpos = { { { 0.5, 0.5, 0 },
     { 0.5, -0.5, 0 },
     { 0.5, 0, 0.5 },
     { 0.5, 0, -0.5 },
@@ -120,41 +119,23 @@ unsigned int countInside(const std::array<int, 3> &cell, double radius, const Ve
     { 0, -0.5, 0.5 },
     { 0, -0.5, -0.5 } } };
 
+  // Join all the relative positions
+  std::vector<Vect3> all_relpos{};
+  all_relpos.insert(all_relpos.end(), faces_relpos.begin(), faces_relpos.end());
+  all_relpos.insert(all_relpos.end(), vertices_relpos.begin(), vertices_relpos.end());
+  all_relpos.insert(all_relpos.end(), edges_relpos.begin(), edges_relpos.end());
+
   unsigned int inside_count = 0;
 
-  for (const auto &face : faces_relpos) {
-    Vect3 face_pos = { static_cast<double>(cell[0]) + face.x,
-      static_cast<double>(cell[1]) + face.y,
-      static_cast<double>(cell[2]) + face.z };
-    Vect3 face_vect = vect12(center, face_pos);
+  for (const auto &relpos : all_relpos) {
+    Vect3 pos = { static_cast<double>(cell[0]) + relpos.x,
+      static_cast<double>(cell[1]) + relpos.y,
+      static_cast<double>(cell[2]) + relpos.z };
+    Vect3 vect = vect12(center, pos);
     if (count_boundary) {
-      if (abs(face_vect) < radius) { inside_count++; }
+      if (abs(vect) < radius) { inside_count++; }
     } else {
-      if (abs(face_vect) <= radius) { inside_count++; }
-    }
-  }
-
-  for (const auto &vertex : vertices_relpos) {
-    Vect3 vertex_pos = { static_cast<double>(cell[0]) + vertex.x,
-      static_cast<double>(cell[1]) + vertex.y,
-      static_cast<double>(cell[2]) + vertex.z };
-    Vect3 vertex_vect = vect12(center, vertex_pos);
-    if (count_boundary) {
-      if (abs(vertex_vect) < radius) { inside_count++; }
-    } else {
-      if (abs(vertex_vect) <= radius) { inside_count++; }
-    }
-  }
-
-  for (const auto &edge : edges_relpos) {
-    Vect3 edge_pos = { static_cast<double>(cell[0]) + edge.x,
-      static_cast<double>(cell[1]) + edge.y,
-      static_cast<double>(cell[2]) + edge.z };
-    Vect3 edge_vect = vect12(center, edge_pos);
-    if (count_boundary) {
-      if (abs(edge_vect) < radius) { inside_count++; }
-    } else {
-      if (abs(edge_vect) <= radius) { inside_count++; }
+      if (abs(vect) <= radius) { inside_count++; }
     }
   }
 
