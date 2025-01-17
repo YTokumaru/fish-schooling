@@ -1,0 +1,46 @@
+name: test
+on:
+  pull_request:
+  release:
+    types: [published]
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+          sudo apt-get install -y clang
+          sudo apt-get install -y cmake
+          sudo apt-get install -y gcovr
+          sudo apt-get install -y cppcheck
+          sudo apt-get install -y clang-tidy
+          sudo apt-get install -y ninja-build
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -G Ninja ..
+          ninja
+
+      - name: Test
+        run: |
+          cd build
+          ctest
+
+      - name: Code coverage
+        run: |
+          gcovr -r . -f src -f include --xml-pretty -o coverage.xml --gcov-executable "llvm-cov gcov"
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
