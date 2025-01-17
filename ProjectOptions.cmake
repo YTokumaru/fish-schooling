@@ -2,8 +2,9 @@
 macro(project_setup_options)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         # Compiler flags
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g --coverage")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g --coverage")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 
         option(PROJECT_ENABLE_CLANG_TIDY "Enable clang-tidy checks" ON)
         option(PROJECT_ENABLE_CPPCHECK "Enable cppcheck checks" ON)
