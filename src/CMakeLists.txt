@@ -1,9 +1,9 @@
-add_executable(fish_school main.cpp)
-target_link_libraries(fish_school PRIVATE project_options)
-target_link_libraries(fish_school PRIVATE fish coordinate simulation io eom)
-target_link_libraries(fish_school PRIVATE yaml-cpp::yaml-cpp argparse)
+add_executable(fish_schooling main.cpp)
+target_link_libraries(fish_schooling PRIVATE project_options)
+target_link_libraries(fish_schooling PRIVATE fish coordinate simulation io eom)
+target_link_libraries(fish_schooling PRIVATE yaml-cpp::yaml-cpp argparse)
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(fish_school PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(fish_schooling PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
 add_library(coordinate coordinate.cpp)
@@ -28,7 +28,7 @@ target_link_libraries(io PRIVATE simulation project_options)
 target_link_libraries(io PUBLIC yaml-cpp::yaml-cpp argparse)
 
 # Set the clang-tidy checks
-set(SRC_TARGETS fish_school coordinate simulation fish eom io)
+set(SRC_TARGETS fish_schooling coordinate simulation fish eom io)
 get_target_property(OPTION_TIDY project_options CXX_CLANG_TIDY)
 if(OPTION_TIDY)
     set_target_properties(${SRC_TARGETS} PROPERTIES CXX_CLANG_TIDY "${OPTION_TIDY}")

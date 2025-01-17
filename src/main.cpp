@@ -16,7 +16,7 @@
 int main(int argc, char *argv[])
 {
   // Parse the command line arguments
-  argparse::ArgumentParser program("fish_school");
+  argparse::ArgumentParser program("fish_schooling");
 
   if (parseArguments(argc, argv, program) == EXIT_FAILURE) {
     std::cout << program;

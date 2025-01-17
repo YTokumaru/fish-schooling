@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(EXPORT_COMPILE_COMMANDS ON)
 
 project(
-  fish-school
+  fish-schooling
   VERSION 0.0.1
   DESCRIPTION "Simulator of fish schooling"
   LANGUAGES CXX C)
@@ -49,7 +49,7 @@ add_subdirectory(src)
 # Copy the config.yaml file to the build directory
 file(COPY ${CMAKE_SOURCE_DIR}/config.yaml DESTINATION ${CMAKE_BINARY_DIR}/src)
 
-install(TARGETS fish_school DESTINATION .)
+install(TARGETS fish_schooling DESTINATION .)
 install(FILES ${CMAKE_SOURCE_DIR}/config.yaml DESTINATION .)
 install(FILES ${CMAKE_SOURCE_DIR}/create_movie.sh DESTINATION .
 PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE)
