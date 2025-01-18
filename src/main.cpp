@@ -56,21 +56,23 @@ int main(int argc, char *argv[])
   }
 
   // Pre-generate the relative positions of the neighboring cells
-  auto repulsion_boundary = getBoundaryCells(fish_param.repulsion_radius);
-  auto repulsion_inner = getInnerCells(fish_param.repulsion_radius);
+  const auto repulsion_boundary = getBoundaryCells(fish_param.repulsion_radius);
+  const auto repulsion_inner = getInnerCells(fish_param.repulsion_radius);
 
-  auto attractive_boundary = getBoundaryBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
-  auto attractive_inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
+  const auto attractive_boundary = getBoundaryBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
+  const auto attractive_inner = getInnerBetween(fish_param.repulsion_radius, fish_param.attraction_radius);
 
   // Main loop
   for (unsigned int time_step = 0; time_step < sim_param.max_steps; time_step++) {
 
 
     std::cout << "Time step: " << time_step << '\n';
-    // Sort the fish into 1x1x1 grid cells
+
     std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
       std::vector<std::vector<std::vector<Fish *>>>(
         sim_param.length, std::vector<std::vector<Fish *>>(sim_param.length)));
+
+    // Sort the fish into 1x1x1 grid cells
     for (auto &one_fish : fish) {
       auto [x_pos, y_pos, z_pos] = one_fish.getPosition();
       auto x = static_cast<unsigned long>(x_pos);
@@ -81,32 +83,32 @@ int main(int argc, char *argv[])
     }
 
 // Loop over the fish and store the delta velocity
-#pragma omp parallel for default(none), \
-  shared(                               \
-      fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner, attractive_boundary, attractive_inner)
-    for (auto &one_fish : fish) {
+#pragma omp parallel default(none) shared(cells, fish, output_file), \
+  firstprivate(fish_param, sim_param, repulsion_boundary, repulsion_inner, attractive_boundary, attractive_inner)
+    {
+#pragma omp for schedule(static)
+      for (auto &one_fish : fish) {
 
-      // Calculate the self-propulsion
-      auto delta_v_self = calcSelfPropulsion(one_fish, fish_param);
+        // Calculate the self-propulsion
+        auto delta_v_self = calcSelfPropulsion(one_fish, fish_param);
 
-      auto [delta_v_repulsion, n_fish_repulsion] =
-        calcRepulsion(one_fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner);
+        auto [delta_v_repulsion, n_fish_repulsion] =
+          calcRepulsion(one_fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner);
 
-      if (n_fish_repulsion < fish_param.n_cog) { one_fish.setLambda(fish_param.attraction_str); }
+        if (n_fish_repulsion < fish_param.n_cog) { one_fish.setLambda(fish_param.attraction_str); }
 
-      if (one_fish.getLambda() > 0) {
-        auto [delta_v_attraction, n_fish_attrac] =
-          calcAttraction(one_fish, sim_param, fish_param, cells, attractive_boundary, attractive_inner);
+        if (one_fish.getLambda() > 0) {
+          auto [delta_v_attraction, n_fish_attrac] =
+            calcAttraction(one_fish, sim_param, fish_param, cells, attractive_boundary, attractive_inner);
 
-        one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion + delta_v_attraction);
-      } else {
-        one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion);
+          one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion + delta_v_attraction);
+        } else {
+          one_fish.setDeltaVelocity(delta_v_self + delta_v_repulsion);
+        }
       }
     }
 
-
     // Update the fish positions and velocities
-#pragma omp parallel for default(none), shared(fish, sim_param, fish_param)
     for (auto &one_fish : fish) { one_fish.update(sim_param, fish_param); }
 
     if (time_step % sim_param.snapshot_interval == 0) {
