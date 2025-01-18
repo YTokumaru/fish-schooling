@@ -1,6 +1,7 @@
 #include "io.hpp"
 
 #include "simulation.hpp"
+#include <argparse/argparse.hpp>
 #include <cstdlib>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -159,3 +160,89 @@ TEST_F(ConfigLoaderTest, NegativeValues)
   EXPECT_EQ(negativeValuesConfig >> sim_param, EXIT_FAILURE);
   EXPECT_EQ(negativeValuesConfig >> fish_param, EXIT_FAILURE);
 }
+
+// NOLINTBEGIN
+TEST(AgumentParsingTest, ParseConfigFile)
+{
+  // Create a valid argument list
+  const int argc = 3;
+  char **argv = new char *[argc];
+  argv[0] = const_cast<char *>("fish_schooling");
+  argv[1] = const_cast<char *>("-c");
+  argv[2] = const_cast<char *>("config.yaml");
+
+  // Call the argument parser
+  argparse::ArgumentParser program("fish_schooling");
+
+  const int result = parseArguments(argc, argv, program);
+
+  EXPECT_EQ(result, EXIT_SUCCESS);
+
+  // Check if the correct file is returned
+  EXPECT_EQ(program.get<std::string>("-c"), "config.yaml");
+  EXPECT_EQ(program.get<std::string>("-o"), "output.txt");
+
+  delete[] argv;
+}
+
+TEST(ArgumentParsingTest, MissingConfigFile)
+{
+  // Create an argument list without the config file
+  const int argc = 1;
+  char **argv = new char *[argc];
+  argv[0] = const_cast<char *>("fish_schooling");
+
+  // Call the argument parser
+  argparse::ArgumentParser program("fish_schooling");
+
+  const int result = parseArguments(argc, argv, program);
+
+  EXPECT_EQ(result, EXIT_FAILURE);
+
+  delete[] argv;
+}
+
+TEST(ArgumentParsingTest, WrongArgument)
+{
+  // Create an argument list with a wrong argument
+  const int argc = 3;
+  char **argv = new char *[argc];
+  argv[0] = const_cast<char *>("fish_schooling");
+  argv[1] = const_cast<char *>("-x");
+  argv[2] = const_cast<char *>("config.yaml");
+
+  // Call the argument parser
+  argparse::ArgumentParser program("fish_schooling");
+
+  const int result = parseArguments(argc, argv, program);
+
+  EXPECT_EQ(result, EXIT_FAILURE);
+
+  delete[] argv;
+}
+
+TEST(ArgumentParsingTest, CustomOutputFile)
+{
+  // Create a valid argument list
+  const int argc = 5;
+  char **argv = new char *[argc];
+  argv[0] = const_cast<char *>("fish_schooling");
+  argv[1] = const_cast<char *>("-c");
+  argv[2] = const_cast<char *>("config.yaml");
+  argv[3] = const_cast<char *>("-o");
+  argv[4] = const_cast<char *>("my_output.txt");
+
+  // Call the argument parser
+  argparse::ArgumentParser program("fish_schooling");
+
+  const int result = parseArguments(argc, argv, program);
+
+  EXPECT_EQ(result, EXIT_SUCCESS);
+
+  // Check if the correct file is returned
+  EXPECT_EQ(program.get<std::string>("-o"), "my_output.txt");
+
+  delete[] argv;
+}
+
+// NOLINTEND

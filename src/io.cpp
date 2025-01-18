@@ -48,9 +48,9 @@ int operator>>(const YAML::Node &node, FishParam &param)
 
 int parseArguments(int argc, char **argv, argparse::ArgumentParser &program)
 {
-  program.add_argument("--config").help("The path to the configuration file").required();
+  program.add_argument("-c", "--config").help("The path to the configuration file").required();
 
-  program.add_argument("--output").help("The path to the output file").default_value(std::string("output.txt"));
+  program.add_argument("-o", "--output").help("The path to the output file").default_value(std::string("output.txt"));
 
   try {
     program.parse_args(argc, argv);

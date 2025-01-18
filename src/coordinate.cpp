@@ -65,14 +65,26 @@ Vect3 operator/=(Vect3 &lhs, double scalar)
 Vect3 periodic(const Vect3 &vect, unsigned int len)
 {
   auto len_f = static_cast<double>(len);
-  double x = vect.x - len_f;
-  if (x < 0) { x += len_f; }
+  double x = vect.x;
+  if (x < 0) {
+    x += len_f;
+  } else if (x >= len_f) {
+    x -= len_f;
+  }
 
-  double y = vect.y - len_f;
-  if (y < 0) { y += len_f; }
+  double y = vect.y;
+  if (y < 0) {
+    y += len_f;
+  } else if (y >= len_f) {
+    y -= len_f;
+  }
 
-  double z = vect.z - len_f;
-  if (z < 0) { z += len_f; }
+  double z = vect.z;
+  if (z < 0) {
+    z += len_f;
+  } else if (z >= len_f) {
+    z -= len_f;
+  }
 
   return { .x = x, .y = y, .z = z };
 }
@@ -81,6 +93,8 @@ double absolute(const Vect3 &vect) { return std::sqrt((vect.x * vect.x) + (vect.
 
 Vect3 normalize(const Vect3 &vect)
 {
+  if (vect.x == 0 && vect.y == 0 && vect.z == 0) { return vect; }
+
   const double magnitude = absolute(vect);
   return { .x = vect.x / magnitude, .y = vect.y / magnitude, .z = vect.z / magnitude };
 }
