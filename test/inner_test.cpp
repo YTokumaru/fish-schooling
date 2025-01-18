@@ -8,6 +8,13 @@
 
 using namespace testing;
 
+TEST(InnerTest, RadiusNegative)
+{
+  const double radius = -1.0;
+  auto result = getInnerCells(radius);
+  EXPECT_TRUE(result.empty());
+}
+
 TEST(InnerTest, RadiusZero)
 {
   const double radius = 0.0;

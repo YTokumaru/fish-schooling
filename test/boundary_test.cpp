@@ -6,6 +6,13 @@
 
 using namespace testing;
 
+TEST(BoundaryTest, RadiusNegative)
+{
+  const double radius = -1.0;
+  auto result = getBoundaryCells(radius);
+  EXPECT_TRUE(result.empty());
+}
+
 TEST(BoundaryTest, RadiusZero)
 {
   const double radius = 0.0;
