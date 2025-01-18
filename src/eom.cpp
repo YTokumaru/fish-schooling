@@ -1,24 +1,30 @@
 #include "eom.hpp"
+
 #include "coordinate.hpp"
 #include "fish.hpp"
 #include "simulation.hpp"
+
+#include <algorithm>
+#include <array>
+#include <tuple>
+#include <vector>
 
 Vect3 calcDeltaVRepulsion(const Fish &fish,
   const Fish &other_fish,
   const SimParam &sim_param,
   const FishParam &fish_param)
 {
-  Vect3 delta_v_repulsion{ 0.0, 0.0, 0.0 };
+  Vect3 delta_v_repulsion{ .x = 0.0, .y = 0.0, .z = 0.0 };
 
   // Orientational interaction
   delta_v_repulsion +=
-    g(abs(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)), fish_param.body_length)
+    g(absolute(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)), fish_param.body_length)
     * vect12(fish.getVelocity(), other_fish.getVelocity(), sim_param.length);
 
   // Repulsion interaction
   delta_v_repulsion +=
-    g(abs(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)), fish_param.body_length)
-    * (fish_param.vel_repulsion / abs(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length))
+    g(absolute(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)), fish_param.body_length)
+    * (fish_param.vel_repulsion / absolute(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length))
          * vect12(other_fish.getPosition(), fish.getPosition(), sim_param.length)
        - fish.getVelocity());
 
@@ -34,7 +40,7 @@ Vect3 calcDeltaVAttraction(const Fish &fish,
 
   // Attraction interaction
   delta_v_attraction +=
-    (fish_param.vel_escape / abs(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)))
+    (fish_param.vel_escape / absolute(vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)))
       * vect12(fish.getPosition(), other_fish.getPosition(), sim_param.length)
     - fish.getVelocity();
 
@@ -85,9 +91,9 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
   }
 
   // Sort the fish in the inner cells based on the distance to the fish
-  std::sort(inner_fish_ptr.begin(), inner_fish_ptr.end(), [&fish, &sim_param](Fish *fish1, Fish *fish2) {
-    return abs(vect12(fish.getPosition(), fish1->getPosition(), sim_param.length))
-           < abs(vect12(fish.getPosition(), fish2->getPosition(), sim_param.length));
+  std::sort(inner_fish_ptr.begin(), inner_fish_ptr.end(), [&fish, &sim_param](const Fish *fish1, const Fish *fish2) {
+    return absolute(vect12(fish.getPosition(), fish1->getPosition(), sim_param.length))
+           < absolute(vect12(fish.getPosition(), fish2->getPosition(), sim_param.length));
   });
 
 
@@ -119,7 +125,7 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
       if (neighbour_fish_ptr == &fish) { continue; }
 
       // Check if the fish is within the repulsion radius
-      if (abs(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
+      if (absolute(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
           > fish_param.repulsion_radius) {
         continue;
       }
@@ -128,19 +134,21 @@ std::tuple<Vect3, unsigned int> calcRepulsion(const Fish &fish,
   }
 
   // Sort the fish in the boundary cells based on the distance to the fish
-  std::sort(boundary_fish_ptr.begin(), boundary_fish_ptr.end(), [&fish, &sim_param](Fish *fish1, Fish *fish2) {
-    return abs(vect12(fish.getPosition(), fish1->getPosition(), sim_param.length))
-           < abs(vect12(fish.getPosition(), fish2->getPosition(), sim_param.length));
-  });
+  std::sort(
+    boundary_fish_ptr.begin(), boundary_fish_ptr.end(), [&fish, &sim_param](const Fish *fish1, const Fish *fish2) {
+      return absolute(vect12(fish.getPosition(), fish1->getPosition(), sim_param.length))
+             < absolute(vect12(fish.getPosition(), fish2->getPosition(), sim_param.length));
+    });
 
   // Calculate the repulsion with up to n_cog - neighbour_count nearest fish
-  unsigned long inner_fish_size = neighbour_count;
+  const unsigned long inner_fish_size = neighbour_count;
   for (unsigned long i = 0; i < std::min(fish_param.n_cog - inner_fish_size, boundary_fish_ptr.size()); i++) {
     delta_v_repulsion += calcDeltaVRepulsion(fish, *boundary_fish_ptr[i], sim_param, fish_param);
     neighbour_count++;
   }
 
-  return { neighbour_count != 0 ? delta_v_repulsion / neighbour_count : Vect3{ 0.0, 0.0, 0.0 }, neighbour_count };
+  return { neighbour_count != 0 ? delta_v_repulsion / neighbour_count : Vect3{ .x = 0.0, .y = 0.0, .z = 0.0 },
+    neighbour_count };
 }
 
 std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
@@ -150,7 +158,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
   const std::vector<std::array<int, 3>> &attractive_boundary,
   const std::vector<std::array<int, 3>> &attractive_inner)
 {
-  Vect3 delta_v_attraction{ 0.0, 0.0, 0.0 };
+  Vect3 delta_v_attraction{ .x = 0.0, .y = 0.0, .z = 0.0 };
   unsigned int neighbour_count = 0;// Number of neighboring fish
   auto [fish_x, fish_y, fish_z] = fish.getPosition();
   auto center_x = static_cast<unsigned long>(fish_x);
@@ -169,14 +177,14 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     loop_z = (loop_z + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
 
     // Loop through the fish in the neighboring cell
-    for (auto *neighbour_fish_ptr :
+    for (const auto *neighbour_fish_ptr :
       cells[static_cast<unsigned int>(loop_x)][static_cast<unsigned int>(loop_y)][static_cast<unsigned int>(loop_z)]) {
       // Skip the fish itself
       if (neighbour_fish_ptr == &fish) { continue; }
       // Check if the fish is within the attraction radius
-      if (abs(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
+      if (absolute(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
             > fish_param.attraction_radius
-          || abs(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
+          || absolute(vect12(fish.getPosition(), neighbour_fish_ptr->getPosition(), sim_param.length))
                < fish_param.repulsion_radius) {
         continue;
       }
@@ -200,7 +208,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     loop_z = (loop_z + static_cast<int>(sim_param.length)) % static_cast<int>(sim_param.length);
 
     // Loop through the fish in the neighboring cell
-    for (auto *neighbour_fish_ptr :
+    for (const auto *neighbour_fish_ptr :
       cells[static_cast<unsigned int>(loop_x)][static_cast<unsigned int>(loop_y)][static_cast<unsigned int>(loop_z)]) {
       // Skip the fish itself
       if (neighbour_fish_ptr == &fish) { continue; }
@@ -211,6 +219,7 @@ std::tuple<Vect3, unsigned int> calcAttraction(const Fish &fish,
     }
   }
 
-  return { neighbour_count != 0 ? fish.getLambda() * delta_v_attraction / neighbour_count : Vect3{ 0.0, 0.0, 0.0 },
+  return { neighbour_count != 0 ? fish.getLambda() * delta_v_attraction / neighbour_count
+                                : Vect3{ .x = 0.0, .y = 0.0, .z = 0.0 },
     neighbour_count };
 }

@@ -1,12 +1,16 @@
 #include "coordinate.hpp"
+#include <array>
+#include <cmath>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <numbers>
+#include <vector>
 
 using namespace testing;
 
 TEST(InnerTest, RadiusZero)
 {
-  double radius = 0.0;
+  const double radius = 0.0;
   auto result = getInnerCells(radius);
   EXPECT_TRUE(result.empty());
 }
@@ -20,9 +24,9 @@ TEST(InnerTest, RadiusLessThanRootThree)
 
 TEST(InnerTest, RadiusRootThree)
 {
-  const double radius = std::sqrt(3);
+  const double radius = std::numbers::sqrt3;
   auto result = getInnerCells(radius);
-  std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
+  const std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
   EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
 }
 
@@ -30,7 +34,7 @@ TEST(InnerTest, RadiusTwo)
 {
   const double radius = 2.0;
   auto result = getInnerCells(radius);
-  std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
+  const std::vector<std::array<int, 3>> expected = { { 0, 0, 0 } };
   EXPECT_THAT(result, ::testing::UnorderedElementsAreArray(expected));
 }
 
@@ -38,7 +42,7 @@ TEST(InnerTest, RadiusRootSix)
 {
   const double radius = std::sqrt(6);
   auto result = getInnerCells(radius);
-  std::vector<std::array<int, 3>> expected = {
+  const std::vector<std::array<int, 3>> expected = {
     { 0, 0, 0 },
     { 1, 0, 0 },
     { 0, 1, 0 },

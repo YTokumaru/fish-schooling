@@ -4,14 +4,15 @@
 #include "io.hpp"
 #include "simulation.hpp"
 #include <argparse/argparse.hpp>
-#include <array>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <omp.h>
 #include <random>
 #include <string>
-
+#include <vector>
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/node/parse.h>
 
 int main(int argc, char *argv[])
 {
@@ -25,17 +26,17 @@ int main(int argc, char *argv[])
 
 
   // Load the parameters from the YAML file
-  YAML::Node config = YAML::LoadFile(program.get<std::string>("--config"));
+  const YAML::Node config = YAML::LoadFile(program.get<std::string>("--config"));
 
   FishParam fish_param{};
   SimParam sim_param{};
 
   if ((config >> fish_param) == EXIT_FAILURE) {
-    std::cerr << "Error reading fish parameters" << std::endl;
+    std::cerr << "Error reading fish parameters" << '\n';
     return 1;
   }
   if ((config >> sim_param) == EXIT_FAILURE) {
-    std::cerr << "Error reading simulation parameters" << std::endl;
+    std::cerr << "Error reading simulation parameters" << '\n';
     return 1;
   }
 
@@ -50,8 +51,8 @@ int main(int argc, char *argv[])
 
   std::vector<Fish> fish(sim_param.n_fish, Fish{});
   for (auto &one_fish : fish) {
-    one_fish.setPosition({ dis_pos(gen), dis_pos(gen), dis_pos(gen) });
-    one_fish.setVelocity({ dis_vel(gen), dis_vel(gen), dis_vel(gen) });
+    one_fish.setPosition({ .x = dis_pos(gen), .y = dis_pos(gen), .z = dis_pos(gen) });
+    one_fish.setVelocity({ .x = dis_vel(gen), .y = dis_vel(gen), .z = dis_vel(gen) });
   }
 
   // Pre-generate the relative positions of the neighboring cells
@@ -64,8 +65,8 @@ int main(int argc, char *argv[])
   // Main loop
   for (unsigned int time_step = 0; time_step < sim_param.max_steps; time_step++) {
 
-    std::cout << "Time step: " << time_step << std::endl;
 
+    std::cout << "Time step: " << time_step << '\n';
     // Sort the fish into 1x1x1 grid cells
     std::vector<std::vector<std::vector<std::vector<Fish *>>>> cells(sim_param.length,
       std::vector<std::vector<std::vector<Fish *>>>(
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
 // Loop over the fish and store the delta velocity
 #pragma omp parallel for default(none), \
   shared(                               \
-    fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner, attractive_boundary, attractive_inner)
+      fish, sim_param, fish_param, cells, repulsion_boundary, repulsion_inner, attractive_boundary, attractive_inner)
     for (auto &one_fish : fish) {
 
       // Calculate the self-propulsion

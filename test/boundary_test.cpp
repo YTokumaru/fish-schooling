@@ -1,12 +1,14 @@
 #include "coordinate.hpp"
+#include <array>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vector>
 
 using namespace testing;
 
 TEST(BoundaryTest, RadiusZero)
 {
-  double radius = 0.0;
+  const double radius = 0.0;
   auto result = getBoundaryCells(radius);
   EXPECT_TRUE(result.empty());
 }
@@ -51,7 +53,7 @@ TEST(BoundaryTest, RadiusPointZeroSevenFive)
   const double radius = 0.75;
   auto result = getBoundaryCells(radius);
   ASSERT_EQ(result.size(), 27);
-  std::vector<std::array<int, 3>> expected = { { 0, 0, 0 },
+  const std::vector<std::array<int, 3>> expected = { { 0, 0, 0 },
     { 0, 0, 1 },
     { 0, 1, 0 },
     { 1, 0, 0 },
@@ -86,7 +88,7 @@ TEST(BoundaryTest, RadiusTwo)
 {
   const double radius = 2.0;
   auto result = getBoundaryCells(radius);
-  std::vector<std::array<int, 3>> expected = { { 0, 0, 1 },
+  const std::vector<std::array<int, 3>> expected = { { 0, 0, 1 },
     { 0, 1, 0 },
     { 1, 0, 0 },
     { 0, 0, -1 },
@@ -227,7 +229,7 @@ TEST(BoundaryBetweenTest, RadiusLessThanOrEqualToPointFive)
   const double radius1 = 0.5;
   const double radius2 = 0.5;
   auto result = getBoundaryBetween(radius1, radius2);
-  std::vector<std::array<int, 3>> expected = { { 0, 0, 0 },
+  const std::vector<std::array<int, 3>> expected = { { 0, 0, 0 },
     { 1, 0, 0 },
     { 0, 1, 0 },
     { 0, 0, 1 },

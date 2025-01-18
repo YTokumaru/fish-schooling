@@ -3,7 +3,6 @@
 
 #include "coordinate.hpp"
 #include "simulation.hpp"
-#include <array>
 #include <cmath>
 
 class Fish

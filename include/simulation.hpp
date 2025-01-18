@@ -1,9 +1,6 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#include "coordinate.hpp"
-#include <array>
-#include <vector>
 
 struct SimParam
 {

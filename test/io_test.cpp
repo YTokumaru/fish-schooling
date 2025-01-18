@@ -1,9 +1,12 @@
+#include "io.hpp"
+
+#include "simulation.hpp"
+#include <cstdlib>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <yaml-cpp/yaml.h>
-
-#include "io.hpp"
-#include <fstream>
+#include <string>
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/node/parse.h>
 
 using namespace testing;
 
@@ -18,9 +21,8 @@ public:
 class ConfigLoaderTest : public ::testing::Test
 {
 protected:
-  MockYAML mock_yaml;
-  SimParam sim_param{};
-  FishParam fish_param{};
+  [[maybe_unused]] SimParam sim_param{};
+  [[maybe_unused]] FishParam fish_param{};
 
   YAML::Node validConfig;
 
@@ -45,6 +47,9 @@ protected:
               attraction-strength: 15.0
               attraction-duration: 0.1
         )");
+    // Explicitly reference the members to suppress unused warnings
+    (void)sim_param;
+    (void)fish_param;
   }
 };
 
@@ -74,7 +79,7 @@ TEST_F(ConfigLoaderTest, ParseValidConfig)
 
 TEST_F(ConfigLoaderTest, MissingSimParamsKey)
 {
-  YAML::Node incompleteConfig = YAML::Load(R"(
+  const YAML::Node incompleteConfig = YAML::Load(R"(
         fish-params:
           vel-standard: 1.5
           vel-repulsion: 1.5
@@ -85,7 +90,7 @@ TEST_F(ConfigLoaderTest, MissingSimParamsKey)
 
 TEST_F(ConfigLoaderTest, MissingFishParamsKey)
 {
-  YAML::Node incompleteConfig = YAML::Load(R"(
+  const YAML::Node incompleteConfig = YAML::Load(R"(
         simulation-params:
           length: 64
           n-fish: 1000
@@ -96,7 +101,7 @@ TEST_F(ConfigLoaderTest, MissingFishParamsKey)
 
 TEST_F(ConfigLoaderTest, WrongType)
 {
-  YAML::Node wrongTypeConfig = YAML::Load(R"(
+  const YAML::Node wrongTypeConfig = YAML::Load(R"(
         simulation-params: 1000
         fish-params: 1000
     )");
@@ -107,7 +112,7 @@ TEST_F(ConfigLoaderTest, WrongType)
 
 TEST_F(ConfigLoaderTest, WrongDataType)
 {
-  YAML::Node wrongDataTypeConfig = YAML::Load(R"(
+  const YAML::Node wrongDataTypeConfig = YAML::Load(R"(
         simulation-params:
           length: 
           n-fish: "1000"
@@ -132,7 +137,7 @@ TEST_F(ConfigLoaderTest, WrongDataType)
 
 TEST_F(ConfigLoaderTest, NegativeValues)
 {
-  YAML::Node negativeValuesConfig = YAML::Load(R"(
+  const YAML::Node negativeValuesConfig = YAML::Load(R"(
         simulation-params:
           length: -64
           n-fish: -1000

@@ -1,5 +1,13 @@
 #include "io.hpp"
-#include "yaml-cpp/exceptions.h"
+
+#include "simulation.hpp"
+
+#include <argparse/argparse.hpp>
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
+#include <yaml-cpp/exceptions.h>
+#include <yaml-cpp/node/node.h>
 
 int operator>>(const YAML::Node &node, SimParam &param)
 {
@@ -11,7 +19,7 @@ int operator>>(const YAML::Node &node, SimParam &param)
     param.delta_t = sim_params["delta-t"].as<double>();
     param.snapshot_interval = sim_params["snapshot-interval"].as<unsigned int>();
   } catch (YAML::Exception &e) {
-    std::cerr << "Error while reading from file: " << e.what() << std::endl;
+    std::cerr << "Error while reading from file: " << e.what() << '\n';
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
@@ -31,7 +39,7 @@ int operator>>(const YAML::Node &node, FishParam &param)
     param.attraction_str = fish_params["attraction-strength"].as<double>();
     param.attraction_duration = fish_params["attraction-duration"].as<double>();
   } catch (YAML::Exception &e) {
-    std::cerr << "Error while reading form file: " << e.what() << std::endl;
+    std::cerr << "Error while reading form file: " << e.what() << '\n';
     return EXIT_FAILURE;
   }
 
@@ -47,7 +55,7 @@ int parseArguments(int argc, char **argv, argparse::ArgumentParser &program)
   try {
     program.parse_args(argc, argv);
   } catch (const std::runtime_error &err) {
-    std::cerr << err.what() << std::endl;
+    std::cerr << err.what() << '\n';
     std::cerr << program;
     return EXIT_FAILURE;
   }

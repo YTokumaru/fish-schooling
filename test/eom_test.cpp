@@ -3,8 +3,8 @@
 #include "fish.hpp"
 #include "simulation.hpp"
 #include <cmath>
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vector>
 
 using namespace testing;
 
@@ -24,7 +24,7 @@ TEST(EOMTest, GFactor)
 TEST(EOMTest, SelfPropulsion)
 {
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish({ 0, 0, 0 }, { 0.5, 0.6, 0.7 }, { 0, 0, 0 }, 0);
+  const Fish fish({ .x = 0, .y = 0, .z = 0 }, { .x = 0.5, .y = 0.6, .z = 0.7 }, { .x = 0, .y = 0, .z = 0 }, 0);
   const FishParam fish_param{ .vel_standard = 1.0,
     .vel_repulsion = 1.0,
     .vel_escape = 7.5,
@@ -37,10 +37,10 @@ TEST(EOMTest, SelfPropulsion)
 
   auto delta_v = calcSelfPropulsion(fish, fish_param);
 
-  EXPECT_DOUBLE_EQ(fish.speed(), sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7));
-  EXPECT_DOUBLE_EQ(delta_v.x, (1 / sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7) - 1.0) * 0.5);
-  EXPECT_DOUBLE_EQ(delta_v.y, (1 / sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7) - 1.0) * 0.6);
-  EXPECT_DOUBLE_EQ(delta_v.z, (1 / sqrt(0.5 * 0.5 + 0.6 * 0.6 + 0.7 * 0.7) - 1.0) * 0.7);
+  EXPECT_DOUBLE_EQ(fish.speed(), sqrt((0.5 * 0.5) + (0.6 * 0.6) + (0.7 * 0.7)));
+  EXPECT_DOUBLE_EQ(delta_v.x, (1 / sqrt((0.5 * 0.5) + (0.6 * 0.6) + (0.7 * 0.7)) - 1.0) * 0.5);
+  EXPECT_DOUBLE_EQ(delta_v.y, (1 / sqrt((0.5 * 0.5) + (0.6 * 0.6) + (0.7 * 0.7)) - 1.0) * 0.6);
+  EXPECT_DOUBLE_EQ(delta_v.z, (1 / sqrt((0.5 * 0.5) + (0.6 * 0.6) + (0.7 * 0.7)) - 1.0) * 0.7);
 
   EXPECT_FALSE(std::isnan(delta_v.x));
   EXPECT_FALSE(std::isnan(delta_v.y));
@@ -53,9 +53,9 @@ TEST(EOMTest, Repulsion)
   // Note that the distance between the two is less than the repulsion radius
   // is confined to the xy plane
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
+  Fish fish1({ .x = 0, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 0);
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish2({ 0.5, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
+  Fish fish2({ .x = 0.5, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 0);
 
   const SimParam sim_param{
     .length = 32,
@@ -120,9 +120,9 @@ TEST(EOMTest, RepulsionOverBoundary)
   // Note that the distance between the two is less than the repulsion radius
   // Also note that the movement of the fish is confined to the xy plane
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish1({ 9.75, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
+  Fish fish1({ .x = 9.75, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 0);
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish2({ 0.25, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 0);
+  Fish fish2({ .x = 0.25, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 0);
 
   const SimParam sim_param{ .length = 10, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
@@ -182,9 +182,9 @@ TEST(EOMTest, Attraction)
   // Also note that the movement of the fish is confined to the xy plane
   // Make sure to set lambda to a positive value
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish1({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  Fish fish1({ .x = 0, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 3);
   // NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish2({ 5.0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  Fish fish2({ .x = 5.0, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 3);
 
   const SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
@@ -241,9 +241,9 @@ TEST(EOMTest, AttractionOverBoundary)
   // Also note that the movement of the fish is confined to the xy plane
   // Make sure to set lambda to a positive value
   //// NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish1({ 32 - 0.25, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  Fish fish1({ .x = 32 - 0.25, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 3);
   //// NOLINTNEXTLINE(readability-magic-numbers,cppcoreguidelines-avoid-magic-numbers)
-  Fish fish2({ 4.75, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 3);
+  Fish fish2({ .x = 4.75, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 3);
 
   const SimParam sim_param{ .length = 32, .n_fish = 2, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
@@ -295,7 +295,7 @@ TEST(EOMTest, AttractionOverBoundary)
 
 TEST(EOMTest, NoOtherFishAttraction)
 {
-  Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
+  Fish fish({ .x = 0, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 1);
 
   const SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
@@ -331,7 +331,7 @@ TEST(EOMTest, NoOtherFishAttraction)
 
 TEST(EOMTest, NoOtherFishRepulsion)
 {
-  Fish fish({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, 1);
+  Fish fish({ .x = 0, .y = 0, .z = 0 }, { .x = 0, .y = 1, .z = 0 }, { .x = 0, .y = 0, .z = 0 }, 1);
 
   const SimParam sim_param{ .length = 32, .n_fish = 1, .max_steps = 100, .delta_t = 0.1, .snapshot_interval = 10 };
 
