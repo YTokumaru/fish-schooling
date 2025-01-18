@@ -78,7 +78,7 @@ default_speed = $default_speed
 # Convert to HSL color space, map velocity to range [0,1]
 logistic(x) = 1.0 / (1.0 + exp(-x))
 hue(vx, vy, vz) = atan2(vy, vx) / (2.0 * pi) + 0.5
-saturation(vx, vy, vz) = logistic(sqrt(vx**2 + vy**2 + vz**2) / (sqrt(3 * default_speed**2)))
+saturation(vx, vy, vz) = logistic(sqrt(vx**2 + vy**2 + vz**2) / default_speed**2)
 lightness(vx, vy, vz) = logistic(vz / default_speed)
 
 
