@@ -44,15 +44,34 @@ int main(int argc, char *argv[])
   std::ofstream output_file("output.txt");
 
   // Initialize fish with random positions and velocities
+  // std::random_device rand;
+  // std::mt19937 gen(rand());
+  // std::uniform_real_distribution<double> dis_pos(0.0, sim_param.length);
+  // std::uniform_real_distribution<double> dis_vel(-fish_param.vel_standard, fish_param.vel_standard);
+
+  // std::vector<Fish> fish(sim_param.n_fish, Fish{});
+  // for (auto &one_fish : fish) {
+  //   one_fish.setPosition({ .x = dis_pos(gen), .y = dis_pos(gen), .z = dis_pos(gen) });
+  //   one_fish.setVelocity({ .x = dis_vel(gen), .y = dis_vel(gen), .z = dis_vel(gen) });
+  // }
+
+  // Initialize fish with a shere
   std::random_device rand;
   std::mt19937 gen(rand());
-  std::uniform_real_distribution<double> dis_pos(0.0, sim_param.length);
-  std::uniform_real_distribution<double> dis_vel(-fish_param.vel_standard, fish_param.vel_standard);
+  const double init_r = fish_param.repulsion_radius * std::cbrt(sim_param.n_fish);
+  std::uniform_real_distribution<double> dis_r(0.0, init_r);
+  std::uniform_real_distribution<double> dis_theta(0.0, 2 * M_PI);
+  std::uniform_real_distribution<double> dis_phi(0.0, M_PI);
 
   std::vector<Fish> fish(sim_param.n_fish, Fish{});
   for (auto &one_fish : fish) {
-    one_fish.setPosition({ .x = dis_pos(gen), .y = dis_pos(gen), .z = dis_pos(gen) });
-    one_fish.setVelocity({ .x = dis_vel(gen), .y = dis_vel(gen), .z = dis_vel(gen) });
+    const double r = dis_r(gen);
+    const double theta = dis_theta(gen);
+    const double phi = dis_phi(gen);
+    one_fish.setPosition({ .x = r * std::sin(phi) * std::cos(theta) + static_cast<double>(sim_param.length) / 2,
+      .y = r * std::sin(phi) * std::sin(theta) + static_cast<double>(sim_param.length) / 2,
+      .z = r * std::cos(phi) + static_cast<double>(sim_param.length) / 2 });
+    one_fish.setVelocity({ .x = fish_param.vel_standard, .y = 0, .z = 0 });
   }
 
   // Pre-generate the relative positions of the neighboring cells
@@ -83,7 +102,7 @@ int main(int argc, char *argv[])
     }
 
 // Loop over the fish and store the delta velocity
-#pragma omp parallel default(none) shared(cells, fish, output_file), \
+#pragma omp parallel default(none) shared(cells, fish), \
   firstprivate(fish_param, sim_param, repulsion_boundary, repulsion_inner, attractive_boundary, attractive_inner)
     {
 #pragma omp for schedule(static)
