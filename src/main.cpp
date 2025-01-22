@@ -4,6 +4,7 @@
 #include "io.hpp"
 #include "simulation.hpp"
 #include <argparse/argparse.hpp>
+#include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -58,19 +59,19 @@ int main(int argc, char *argv[])
   // Initialize fish with a shere
   std::random_device rand;
   std::mt19937 gen(rand());
-  const double init_r = fish_param.repulsion_radius * std::cbrt(sim_param.n_fish);
+  const double init_r = fish_param.repulsion_radius * cbrt(sim_param.n_fish);
   std::uniform_real_distribution<double> dis_r(0.0, init_r);
   std::uniform_real_distribution<double> dis_theta(0.0, 2 * M_PI);
   std::uniform_real_distribution<double> dis_phi(0.0, M_PI);
 
   std::vector<Fish> fish(sim_param.n_fish, Fish{});
   for (auto &one_fish : fish) {
-    const double r = dis_r(gen);
+    const double r_init = dis_r(gen);
     const double theta = dis_theta(gen);
     const double phi = dis_phi(gen);
-    one_fish.setPosition({ .x = r * std::sin(phi) * std::cos(theta) + static_cast<double>(sim_param.length) / 2,
-      .y = r * std::sin(phi) * std::sin(theta) + static_cast<double>(sim_param.length) / 2,
-      .z = r * std::cos(phi) + static_cast<double>(sim_param.length) / 2 });
+    one_fish.setPosition({ .x = r_init * std::sin(phi) * std::cos(theta) + static_cast<double>(sim_param.length) / 2,
+      .y = r_init * std::sin(phi) * std::sin(theta) + static_cast<double>(sim_param.length) / 2,
+      .z = r_init * std::cos(phi) + static_cast<double>(sim_param.length) / 2 });
     one_fish.setVelocity({ .x = fish_param.vel_standard, .y = 0, .z = 0 });
   }
 
