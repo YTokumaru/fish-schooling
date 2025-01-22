@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <numbers>
 #include <omp.h>
 #include <random>
 #include <string>
@@ -61,8 +62,8 @@ int main(int argc, char *argv[])
   std::mt19937 gen(rand());
   const double init_r = fish_param.repulsion_radius * cbrt(sim_param.n_fish);
   std::uniform_real_distribution<double> dis_r(0.0, init_r);
-  std::uniform_real_distribution<double> dis_theta(0.0, 2 * M_PI);
-  std::uniform_real_distribution<double> dis_phi(0.0, M_PI);
+  std::uniform_real_distribution<double> dis_theta(0.0, 2 * std::numbers::pi);
+  std::uniform_real_distribution<double> dis_phi(0.0, std::numbers::pi);
 
   std::vector<Fish> fish(sim_param.n_fish, Fish{});
   for (auto &one_fish : fish) {
